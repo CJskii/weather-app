@@ -95,6 +95,36 @@ const weather = {
 const populate = {
   weatherItems: (obj) => {
     // populate weather info
+    const container = document.querySelector(".info-container");
+    const city = document.createElement("div");
+    city.classList.add("city");
+    city.textContent = `${obj.city}, ${obj.country}`;
+    container.appendChild(city);
+    const description = document.createElement("div");
+    description.classList.add("description");
+    description.textContent = obj.description;
+    container.appendChild(description);
+    const tempcontainer = document.createElement("div");
+    tempcontainer.classList.add("temp-container");
+    const temperature = document.createElement("span");
+    temperature.classList.add("temperature");
+    temperature.textContent = obj.temp;
+    const tempBtn = document.createElement("button");
+    tempBtn.classList.add("btn");
+    tempBtn.textContent = "Display in °C";
+    tempcontainer.appendChild(temperature);
+    tempcontainer.appendChild(tempBtn);
+    container.appendChild(tempcontainer);
+    const icon = document.createElement("div");
+    icon.classList.add("icon");
+    container.appendChild(icon);
+    const searchbox = document.createElement("div");
+    searchbox.classList.add("search-container");
+    const inp = document.createElement("input");
+    const searchicon = document.createElement("i");
+    searchbox.appendChild(inp);
+    searchbox.appendChild(searchicon);
+    container.appendChild(searchbox);
     console.log(obj);
   },
   forecastItems: () => {
