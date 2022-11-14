@@ -63,11 +63,39 @@ const weather = {
       console.log(err);
     }
   },
+  dataHandler: (obj) => {
+    console.log(obj);
+    const city = obj.name;
+    const country = obj.sys.country;
+    const temp = obj.main.temp;
+    const tempFeels = obj.main.feels_like;
+    const tempMax = obj.main.temp_max;
+    const tempMin = obj.main.temp_min;
+    const humidity = obj.main.humidity;
+    const pressure = obj.main.pressure;
+    const wind = obj.wind.speed;
+    const clouds = obj.clouds.all;
+    const dataTime = obj.dt;
+    populate.weatherItems({
+      city,
+      country,
+      temp,
+      tempFeels,
+      tempMax,
+      tempMin,
+      humidity,
+      pressure,
+      wind,
+      clouds,
+      dataTime,
+    });
+  },
 };
 
 const populate = {
-  weatherItems: () => {
+  weatherItems: (obj) => {
     // populate weather info
+    console.log(obj);
   },
   forecastItems: () => {
     // populate forcast info
