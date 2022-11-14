@@ -2,6 +2,7 @@ export const App = {
   init: () => {
     const main = document.querySelector("body");
     App.wrapper(main);
+    weather.getData();
   },
   wrapper: (main) => {
     // create main container
@@ -46,6 +47,21 @@ export const App = {
     const container = document.createElement("div");
     container.classList.add("forecast-container-daily");
     forecast.appendChild(container);
+  },
+};
+
+const weather = {
+  getData: async () => {
+    try {
+      const response = await fetch(
+        "https://api.openweathermap.org/data/2.5/weather?q=London,uk&APPID=3e551ddc1e7a94f0f602ed66e45dc2ba",
+        { mode: "cors" }
+      );
+      const data = await response.json();
+      weather.dataHandler(data);
+    } catch (err) {
+      console.log(err);
+    }
   },
 };
 
