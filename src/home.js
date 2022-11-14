@@ -54,7 +54,7 @@ const weather = {
   getData: async () => {
     try {
       const response = await fetch(
-        "https://api.openweathermap.org/data/2.5/weather?q=London,uk&APPID=3e551ddc1e7a94f0f602ed66e45dc2ba",
+        "https://api.openweathermap.org/data/2.5/weather?q=London,uk&APPID=API_HERE",
         { mode: "cors" }
       );
       const data = await response.json();
