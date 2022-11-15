@@ -27,7 +27,7 @@ body {
 
 .weather-container {
   width: 90%;
-  height: 30%;
+  height: 50%;
   background-color: rgba(250, 235, 215, 0.123);
   display: flex;
   justify-content: space-between;
@@ -39,6 +39,117 @@ body {
   width: 40%;
   height: 100%;
   background-color: rgba(0, 255, 255, 0.226);
+}
+
+.info-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  justify-content: flex-start;
+  gap: 10px;
+}
+
+.city {
+  font-size: 2rem;
+}
+
+.description {
+  font-size: 1.6rem;
+}
+
+.time {
+  font-size: 1rem;
+  font-style: italic;
+}
+
+.temperature {
+  font-size: 1.4rem;
+}
+
+.temp-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.search-container {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.search-icon {
+  content: url(./img/search_icon.svg);
+  width: 35px;
+  height: 35px;
+}
+
+/* DETAILS CONTAINER RIGHT TOP */
+
+.details-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-end;
+  gap: 10px;
+}
+
+.weather-details {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin-top: 0.5rem;
+}
+
+.details-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-end;
+  width: 65px;
+}
+
+.details-info > span:first-child {
+  color: white;
+  font-weight: bold;
+}
+
+.humidity-icon {
+  content: url(./img/humidity_icon.svg);
+  width: 35px;
+  height: 35px;
+}
+
+.feelslike-icon {
+  content: url(./img/max-icon.svg);
+  width: 35px;
+  height: 35px;
+}
+
+.wind-icon {
+  content: url(./img/wind-icon.svg);
+  width: 35px;
+  height: 35px;
+}
+
+.pressure-icon {
+  content: url(./img/pressure-icon.svg);
+  width: 35px;
+  height: 35px;
+}
+
+.min-icon {
+  content: url(./img/min-icon.svg);
+  width: 35px;
+  height: 35px;
+}
+
+.max-icon {
+  content: url(./img/max-icon.svg);
+  width: 35px;
+  height: 35px;
 }
 
 /* FORECAST CONTAINER (BOTTOM) */
