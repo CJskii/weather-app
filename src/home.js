@@ -54,7 +54,7 @@ const weather = {
   getData: async () => {
     try {
       const response = await fetch(
-        "https://api.openweathermap.org/data/2.5/weather?q=London,uk&APPID=API_HERE",
+        "https://api.openweathermap.org/data/2.5/weather?q=London,uk&APPID=",
         { mode: "cors" }
       );
       const data = await response.json();
@@ -76,6 +76,8 @@ const weather = {
     const wind = obj.wind.speed;
     const clouds = obj.clouds.all;
     const dataTime = obj.dt;
+    const icon = obj.weather[0].icon;
+    const description = obj.weather[0].description;
     populate.weatherItems({
       city,
       country,
@@ -88,6 +90,8 @@ const weather = {
       wind,
       clouds,
       dataTime,
+      icon,
+      description,
     });
   },
 };
@@ -104,11 +108,15 @@ const populate = {
     description.classList.add("description");
     description.textContent = obj.description;
     container.appendChild(description);
+    const time = document.createElement("div");
+    time.classList.add("time");
+    time.textContent = transform.time(obj.dataTime);
+    container.appendChild(time);
     const tempcontainer = document.createElement("div");
     tempcontainer.classList.add("temp-container");
     const temperature = document.createElement("span");
     temperature.classList.add("temperature");
-    temperature.textContent = obj.temp;
+    temperature.textContent = transform.temp(obj.temp);
     const tempBtn = document.createElement("button");
     tempBtn.classList.add("btn");
     tempBtn.textContent = "Display in °C";
@@ -129,5 +137,34 @@ const populate = {
   },
   forecastItems: () => {
     // populate forcast info
+  },
+};
+
+const transform = {
+  time: (UNIX_timestamp) => {
+    var a = new Date(UNIX_timestamp * 1000);
+    var months = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
+    var year = a.getFullYear();
+    var month = months[a.getMonth()];
+    var date = a.getDate();
+    var hour = a.getHours();
+    var min = a.getMinutes();
+    var sec = a.getSeconds();
+    var time =
+      date + " " + month + " " + year + " " + hour + ":" + min + ":" + sec;
+    return time;
   },
 };
