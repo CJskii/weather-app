@@ -3,6 +3,7 @@ export const App = {
     const main = document.querySelector("body");
     App.wrapper(main);
     weather.getData();
+    weather.getForecast();
   },
   wrapper: (main) => {
     // create main container
@@ -54,11 +55,23 @@ const weather = {
   getData: async () => {
     try {
       const response = await fetch(
-        "https://api.openweathermap.org/data/2.5/weather?q=London,uk&APPID=",
+        "https://api.openweathermap.org/data/2.5/weather?q=London&APPID=",
         { mode: "cors" }
       );
       const data = await response.json();
       weather.dataHandler(data);
+    } catch (err) {
+      console.log(err);
+    }
+  },
+  getForecast: async () => {
+    try {
+      const response = await fetch(
+        "https://api.openweathermap.org/data/2.5/forecast?q=London&appid=",
+        { mode: "cors" }
+      );
+      const data = await response.json();
+      weather.forecastHandler(data);
     } catch (err) {
       console.log(err);
     }
@@ -99,6 +112,15 @@ const weather = {
       tempMax,
       tempMin,
     });
+  },
+  forecastHandler: (obj) => {
+    const name = obj.city.name;
+    const temp = obj.list[0].main.temp;
+    const time = obj.list[0].dt;
+    const tempMin = obj.list[0].main.temp_min;
+    const icon = obj.list[0].weather[0].icon;
+    console.log(obj);
+    console.log({ name, temp, time, tempMin, icon });
   },
 };
 
