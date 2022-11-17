@@ -78,17 +78,14 @@ const weather = {
     }
   },
   dataHandler: (obj) => {
-    console.log(obj);
+    //console.log(obj);
     const city = obj.name;
     const country = obj.sys.country;
     const temp = obj.main.temp;
     const tempFeels = obj.main.feels_like;
-    const tempMax = obj.main.temp_max;
-    const tempMin = obj.main.temp_min;
     const humidity = obj.main.humidity;
     const pressure = obj.main.pressure;
     const wind = obj.wind.speed;
-    const clouds = obj.clouds.all;
     const dataTime = obj.dt;
     const icon = obj.weather[0].icon;
     const description = obj.weather[0].description;
@@ -97,9 +94,6 @@ const weather = {
       city,
       country,
       temp,
-      tempMax,
-      tempMin,
-      clouds,
       dataTime,
       icon,
       description,
@@ -110,8 +104,6 @@ const weather = {
       humidity,
       pressure,
       wind,
-      tempMax,
-      tempMin,
     });
   },
   forecastHandler: (obj) => {
@@ -127,7 +119,6 @@ const weather = {
     }
 
     console.log(obj);
-    //populateWeather.forecastItems({ name, temp, time, icon });
   },
 };
 
@@ -141,7 +132,6 @@ const populateWeather = {
     populateWeather.weatherIcon(container, obj);
     populateWeather.temperature(container, obj);
     populateWeather.searchBox(container);
-    console.log(obj);
   },
   city: (container, obj) => {
     const city = document.createElement("div");
@@ -198,7 +188,6 @@ const populateWeather = {
     populateWeather.humidity(container, obj);
     populateWeather.wind(container, obj);
     populateWeather.pressure(container, obj);
-    console.log(obj);
   },
   humidity: (container, obj) => {
     const details = document.createElement("div");
@@ -273,23 +262,42 @@ const populateWeather = {
 const populateForecast = {
   forecastItems: (obj, i) => {
     // populateWeather forcast info
-    console.log(obj);
     const container = document.querySelector(".forecast");
     populateForecast.forecastDetails(container, obj, i);
+    console.log(obj);
   },
   forecastDetails: (container, obj, i) => {
     const detailsContainer = document.createElement("div");
     detailsContainer.classList.add("forecast-details");
     detailsContainer.classList.add(`forecast${i}`);
     container.appendChild(detailsContainer);
+    if (i >= 6) {
+      // how many forecast details is displayed
+      detailsContainer.style.display = "none";
+    }
+    // populate forecast containers
     populateForecast.time(obj, detailsContainer);
+    populateForecast.temp(obj, detailsContainer);
+    populateForecast.icon(obj, detailsContainer);
   },
   time: (obj, container) => {
     const time = document.createElement("div");
     time.classList.add("forecast-time");
-    time.textContent = obj.time;
+    let value = transform.forecastTime(obj.time);
+    time.textContent = value;
     container.appendChild(time);
-    console.log(time);
+  },
+  temp: (obj, container) => {
+    const temp = document.createElement("div");
+    temp.classList.add("forecast-temp");
+    temp.textContent = obj.temp;
+    container.appendChild(temp);
+  },
+  icon: (obj, container) => {
+    const icon = document.createElement("div");
+    icon.classList.add("forecast-icon");
+    icon.textContent = obj.icon;
+    container.appendChild(icon);
   },
 };
 
@@ -325,5 +333,9 @@ const transform = {
     temp = Math.round(temp * 10) / 10;
     temp = temp + " °C";
     return temp;
+  },
+  forecastTime: (value) => {
+    value = value.slice(10, 16);
+    return value;
   },
 };

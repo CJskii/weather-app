@@ -176,6 +176,19 @@ body {
   background-color: rgba(165, 42, 42, 0.315);
 }
 
-h1 {
-  color: white;
+.forecast {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+.forecast-details {
+  width: 30%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
 }
