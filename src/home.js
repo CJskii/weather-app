@@ -49,9 +49,11 @@ export const App = {
     const btnDaily = document.createElement("button");
     btnDaily.classList.add("btn-daily");
     btnDaily.textContent = "Daily";
+    btnDaily.classList.add("btn");
     const btnHourly = document.createElement("button");
     btnHourly.textContent = "Hourly";
     btnHourly.classList.add("btn-hourly");
+    btnHourly.classList.add("btn");
     btns.appendChild(btnDaily);
     btns.appendChild(btnHourly);
     container.appendChild(btns);
@@ -100,7 +102,7 @@ const weather = {
       );
       const data = await response.json();
       weather.dataHandler(data);
-      return data;
+      weather.dataStorageHandler(data);
     } catch (err) {
       console.log(err);
     }
@@ -113,7 +115,7 @@ const weather = {
       );
       const data = await response.json();
       weather.forecastHandler(data);
-      return data;
+      weather.forecastStorageHandler(data);
     } catch (err) {
       console.log(err);
     }
@@ -157,8 +159,34 @@ const weather = {
       tempMin = transform.temp(tempMin);
       populateForecast.forecastItems({ temp, time, icon }, i);
     }
-
-    console.log(obj);
+  },
+  dataStorageHandler: (obj) => {
+    const check = weather.getDataStorage();
+    if (check.length == 0) {
+      weather.dataStorage.push(obj);
+    } else if (check.length > 0) {
+      weather.dataStorage = [];
+      weather.dataStorage.push(obj);
+    }
+  },
+  forecastStorageHandler: (obj) => {
+    const check = weather.getDataStorage();
+    if (check.length == 0) {
+      weather.forecastStorage.push(obj);
+    } else if (check.length > 0) {
+      weather.forecastStorage = [];
+      weather.forecastStorage.push(obj);
+    }
+  },
+  dataStorage: [],
+  forecastStorage: [],
+  getDataStorage: () => {
+    const data = weather.dataStorage;
+    return data;
+  },
+  getForecastStorage: () => {
+    const data = weather.forecastStorage;
+    return data;
   },
 };
 
@@ -406,8 +434,12 @@ const listeners = {
     right.addEventListener("click", (e) =>
       listeners.right(e, dot1, dot2, dot3)
     );
-    btnDaily.addEventListener("click", (e) => listeners.daily(e, btnDaily));
-    btnHourly.addEventListener("click", (e) => listeners.hourly(e, btnHourly));
+    btnDaily.addEventListener("click", (e) =>
+      listeners.daily(e, btnDaily, btnHourly)
+    );
+    btnHourly.addEventListener("click", (e) =>
+      listeners.hourly(e, btnDaily, btnHourly)
+    );
   },
   left: (e, dot1, dot2, dot3) => {
     const color1 = dot1.style.background;
@@ -443,11 +475,15 @@ const listeners = {
       return;
     }
   },
-  daily: (e, btn) => {
-    console.log(btn);
+  daily: (e, btn1, btn2) => {
+    btn1.classList.add("btn-active");
+    btn2.classList.remove("btn-active");
+    items.dailyForecast();
   },
-  hourly: (e, btn) => {
-    console.log(btn);
+  hourly: (e, btn1, btn2) => {
+    btn2.classList.add("btn-active");
+    btn1.classList.remove("btn-active");
+    items.hourlyForecast();
   },
 };
 
@@ -495,4 +531,6 @@ const items = {
       }
     }
   },
+  dailyForecast: () => {},
+  hourlyForecast: () => {},
 };

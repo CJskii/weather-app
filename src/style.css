@@ -243,6 +243,8 @@ body {
   cursor: pointer;
 }
 
+/* BTNS */
+
 .forecast-btns {
   height: 100%;
   display: flex;
@@ -250,4 +252,46 @@ body {
   align-items: center;
   gap: 10px;
   padding: 10px;
+}
+
+.btn {
+  min-width: 130px;
+  height: 40px;
+  color: #fff;
+  padding: 5px 10px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  display: inline-block;
+  outline: none;
+  border-radius: 5px;
+  z-index: 0;
+  background: rgba(255, 255, 255, 0.075);
+  overflow: hidden;
+  border: 2px solid #4433ff;
+  color: #4433ff;
+}
+.btn:hover {
+  color: #fff;
+  scale: 1.05;
+}
+.btn:hover:after {
+  width: 100%;
+}
+.btn:after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  transition: all 0.5s ease;
+  left: 0;
+  top: 0;
+  width: 0;
+  height: 100%;
+  background: #4433ff;
+}
+
+.btn-active {
+  background: #4433ff;
+  color: #fff;
 }
