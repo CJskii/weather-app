@@ -107,7 +107,6 @@ const weather = {
     });
   },
   forecastHandler: (obj) => {
-    const name = obj.city.name;
     for (let i = 0; i < obj.list.length; i++) {
       let temp = obj.list[i].main.temp;
       const time = obj.list[i].dt_txt;
@@ -115,7 +114,7 @@ const weather = {
       const icon = obj.list[i].weather[0].icon;
       temp = transform.temp(temp);
       tempMin = transform.temp(tempMin);
-      populateForecast.forecastItems({ name, temp, time, icon }, i);
+      populateForecast.forecastItems({ temp, time, icon }, i);
     }
 
     console.log(obj);
@@ -165,9 +164,9 @@ const populateWeather = {
     container.appendChild(tempcontainer);
   },
   weatherIcon: (container, obj) => {
-    const icon = document.createElement("div");
-    icon.classList.add("icon");
-    icon.textContent = obj.icon;
+    const icon = document.createElement("img");
+    icon.classList.add("weather-icon");
+    transform.icon(obj.icon, icon);
     container.appendChild(icon);
   },
   searchBox: (container) => {
@@ -294,9 +293,9 @@ const populateForecast = {
     container.appendChild(temp);
   },
   icon: (obj, container) => {
-    const icon = document.createElement("div");
+    const icon = document.createElement("img");
     icon.classList.add("forecast-icon");
-    icon.textContent = obj.icon;
+    transform.icon(obj.icon, icon);
     container.appendChild(icon);
   },
 };
@@ -337,5 +336,18 @@ const transform = {
   forecastTime: (value) => {
     value = value.slice(10, 16);
     return value;
+  },
+  icon: async (value, icon) => {
+    try {
+      const response = await fetch(
+        `https://openweathermap.org/img/wn/${value}@2x.png`,
+        {
+          mode: "cors",
+        }
+      );
+      icon.src = response.url;
+    } catch (err) {
+      console.log(err);
+    }
   },
 };

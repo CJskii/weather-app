@@ -85,6 +85,11 @@ body {
   height: 35px;
 }
 
+.weather-icon {
+  width: 100px;
+  height: 100px;
+}
+
 /* DETAILS CONTAINER RIGHT TOP */
 
 .details-container {
