@@ -4,6 +4,7 @@ export const App = {
     App.wrapper(main);
     weather.getData();
     weather.getForecast();
+    listeners.init();
   },
   wrapper: (main) => {
     // create main container
@@ -43,6 +44,44 @@ export const App = {
     const container = document.createElement("div");
     container.classList.add("forecast-change");
     forecast.appendChild(container);
+    const btns = document.createElement("div");
+    btns.classList.add("forecast-btns");
+    const btnDaily = document.createElement("button");
+    btnDaily.classList.add("btn-daily");
+    btnDaily.textContent = "Daily";
+    const btnHourly = document.createElement("button");
+    btnHourly.textContent = "Hourly";
+    btnHourly.classList.add("btn-hourly");
+    btns.appendChild(btnDaily);
+    btns.appendChild(btnHourly);
+    container.appendChild(btns);
+    const slider = document.createElement("div");
+    slider.classList.add("slider");
+    const left = document.createElement("i");
+    left.classList.add("slide-left");
+    const dot1 = document.createElement("div");
+    const dot2 = document.createElement("div");
+    const dot3 = document.createElement("div");
+    dot1.style.background = "white";
+    dot1.style.border = "2px solid white";
+    dot2.style.background = "transparent";
+    dot2.style.border = "2px solid white";
+    dot3.style.background = "transparent";
+    dot3.style.border = "2px solid white";
+    dot1.classList.add("dot");
+    dot1.classList.add("dot1");
+    dot2.classList.add("dot");
+    dot2.classList.add("dot2");
+    dot3.classList.add("dot");
+    dot3.classList.add("dot3");
+    const right = document.createElement("i");
+    right.classList.add("slide-right");
+    slider.appendChild(left);
+    slider.appendChild(dot1);
+    slider.appendChild(dot2);
+    slider.appendChild(dot3);
+    slider.appendChild(right);
+    container.appendChild(slider);
   },
   forecastContainer: (forecast) => {
     const container = document.createElement("div");
@@ -61,6 +100,7 @@ const weather = {
       );
       const data = await response.json();
       weather.dataHandler(data);
+      return data;
     } catch (err) {
       console.log(err);
     }
@@ -73,6 +113,7 @@ const weather = {
       );
       const data = await response.json();
       weather.forecastHandler(data);
+      return data;
     } catch (err) {
       console.log(err);
     }
@@ -263,7 +304,7 @@ const populateForecast = {
     // populateWeather forcast info
     const container = document.querySelector(".forecast");
     populateForecast.forecastDetails(container, obj, i);
-    console.log(obj);
+    //console.log(obj);
   },
   forecastDetails: (container, obj, i) => {
     const detailsContainer = document.createElement("div");
@@ -348,6 +389,110 @@ const transform = {
       icon.src = response.url;
     } catch (err) {
       console.log(err);
+    }
+  },
+};
+
+const listeners = {
+  init: () => {
+    const left = document.querySelector(".slide-left");
+    const right = document.querySelector(".slide-right");
+    const dot1 = document.querySelector(".dot1");
+    const dot2 = document.querySelector(".dot2");
+    const dot3 = document.querySelector(".dot3");
+    const btnDaily = document.querySelector(".btn-daily");
+    const btnHourly = document.querySelector(".btn-hourly");
+    left.addEventListener("click", (e) => listeners.left(e, dot1, dot2, dot3));
+    right.addEventListener("click", (e) =>
+      listeners.right(e, dot1, dot2, dot3)
+    );
+    btnDaily.addEventListener("click", (e) => listeners.daily(e, btnDaily));
+    btnHourly.addEventListener("click", (e) => listeners.hourly(e, btnHourly));
+  },
+  left: (e, dot1, dot2, dot3) => {
+    const color1 = dot1.style.background;
+    const color2 = dot2.style.background;
+    const color3 = dot3.style.background;
+    if (color1 == "white") {
+      console.log("cant change me");
+      return;
+    } else if (color2 == "white") {
+      dot1.style.background = "white";
+      dot2.style.background = "transparent";
+      items.renderLeft("1");
+    } else if (color3 == "white") {
+      dot2.style.background = "white";
+      dot3.style.background = "transparent";
+      items.renderLeft("2");
+    }
+  },
+  right: (e, dot1, dot2, dot3) => {
+    const color1 = dot1.style.background;
+    const color2 = dot2.style.background;
+    const color3 = dot3.style.background;
+    if (color1 == "white") {
+      dot1.style.background = "transparent";
+      dot2.style.background = "white";
+      items.renderRight("2");
+    } else if (color2 == "white") {
+      dot3.style.background = "white";
+      dot2.style.background = "transparent";
+      items.renderRight("3");
+    } else if (color3 == "white") {
+      console.log("cant change me");
+      return;
+    }
+  },
+  daily: (e, btn) => {
+    console.log(btn);
+  },
+  hourly: (e, btn) => {
+    console.log(btn);
+  },
+};
+
+const items = {
+  renderRight: (value) => {
+    console.log(value);
+    if (value == "2") {
+      for (let i = 0; i < 6; i++) {
+        const item = document.querySelector(`.forecast${i}`);
+        item.style.display = "none";
+      }
+      for (let i = 6; i < 12; i++) {
+        const item = document.querySelector(`.forecast${i}`);
+        item.style.display = "flex";
+      }
+    } else if (value == "3") {
+      for (let i = 6; i < 12; i++) {
+        const item = document.querySelector(`.forecast${i}`);
+        item.style.display = "none";
+      }
+      for (let i = 12; i < 18; i++) {
+        const item = document.querySelector(`.forecast${i}`);
+        item.style.display = "flex";
+      }
+    }
+  },
+  renderLeft: (value) => {
+    if (value == "2") {
+      for (let i = 12; i < 18; i++) {
+        const item = document.querySelector(`.forecast${i}`);
+        item.style.display = "none";
+      }
+      for (let i = 6; i < 12; i++) {
+        const item = document.querySelector(`.forecast${i}`);
+        item.style.display = "flex";
+      }
+    } else if (value == "1") {
+      for (let i = 6; i < 12; i++) {
+        const item = document.querySelector(`.forecast${i}`);
+        item.style.display = "none";
+      }
+      for (let i = 0; i < 6; i++) {
+        const item = document.querySelector(`.forecast${i}`);
+        item.style.display = "flex";
+      }
     }
   },
 };
