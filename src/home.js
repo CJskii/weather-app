@@ -47,6 +47,7 @@ export const App = {
   forecastContainer: (forecast) => {
     const container = document.createElement("div");
     container.classList.add("forecast-container-daily");
+    container.classList.add("forecast");
     forecast.appendChild(container);
   },
 };
@@ -55,7 +56,7 @@ const weather = {
   getData: async () => {
     try {
       const response = await fetch(
-        "https://api.openweathermap.org/data/2.5/weather?q=London&APPID=",
+        "https://api.openweathermap.org/data/2.5/weather?q=London&APPID=3e551ddc1e7a94f0f602ed66e45dc2ba",
         { mode: "cors" }
       );
       const data = await response.json();
@@ -67,7 +68,7 @@ const weather = {
   getForecast: async () => {
     try {
       const response = await fetch(
-        "https://api.openweathermap.org/data/2.5/forecast?q=London&appid=",
+        "https://api.openweathermap.org/data/2.5/forecast?q=London&appid=3e551ddc1e7a94f0f602ed66e45dc2ba",
         { mode: "cors" }
       );
       const data = await response.json();
@@ -92,7 +93,7 @@ const weather = {
     const icon = obj.weather[0].icon;
     const description = obj.weather[0].description;
     const weatherCondition = obj.weather[0].main;
-    populate.weatherItems({
+    populateWeather.weatherItems({
       city,
       country,
       temp,
@@ -104,7 +105,7 @@ const weather = {
       description,
       weatherCondition,
     });
-    populate.weatherDetails({
+    populateWeather.weatherDetails({
       tempFeels,
       humidity,
       pressure,
@@ -115,25 +116,31 @@ const weather = {
   },
   forecastHandler: (obj) => {
     const name = obj.city.name;
-    const temp = obj.list[0].main.temp;
-    const time = obj.list[0].dt;
-    const tempMin = obj.list[0].main.temp_min;
-    const icon = obj.list[0].weather[0].icon;
+    for (let i = 0; i < obj.list.length; i++) {
+      let temp = obj.list[i].main.temp;
+      const time = obj.list[i].dt_txt;
+      let tempMin = obj.list[i].main.temp_min;
+      const icon = obj.list[i].weather[0].icon;
+      temp = transform.temp(temp);
+      tempMin = transform.temp(tempMin);
+      populateForecast.forecastItems({ name, temp, time, icon }, i);
+    }
+
     console.log(obj);
-    console.log({ name, temp, time, tempMin, icon });
+    //populateWeather.forecastItems({ name, temp, time, icon });
   },
 };
 
-const populate = {
+const populateWeather = {
   weatherItems: (obj) => {
-    // populate weather info
+    // populateWeather weather info
     const container = document.querySelector(".info-container");
-    populate.city(container, obj);
-    populate.description(container, obj);
-    populate.time(container, obj);
-    populate.weatherIcon(container, obj);
-    populate.temperature(container, obj);
-    populate.searchBox(container);
+    populateWeather.city(container, obj);
+    populateWeather.description(container, obj);
+    populateWeather.time(container, obj);
+    populateWeather.weatherIcon(container, obj);
+    populateWeather.temperature(container, obj);
+    populateWeather.searchBox(container);
     console.log(obj);
   },
   city: (container, obj) => {
@@ -185,12 +192,12 @@ const populate = {
   },
   weatherDetails: (obj) => {
     const container = document.querySelector(".details-container");
-    populate.feelsLike(container, obj);
-    //populate.tempMin(container, obj);
-    //populate.tempMax(container, obj);
-    populate.humidity(container, obj);
-    populate.wind(container, obj);
-    populate.pressure(container, obj);
+    populateWeather.feelsLike(container, obj);
+    //populateWeather.tempMin(container, obj);
+    //populateWeather.tempMax(container, obj);
+    populateWeather.humidity(container, obj);
+    populateWeather.wind(container, obj);
+    populateWeather.pressure(container, obj);
     console.log(obj);
   },
   humidity: (container, obj) => {
@@ -261,42 +268,28 @@ const populate = {
     details.appendChild(detailsInfo);
     container.appendChild(details);
   },
-  tempMin: (container, obj) => {
-    const details = document.createElement("div");
-    const detailsInfo = document.createElement("div");
-    details.classList.add("weather-details");
-    detailsInfo.classList.add("details-info");
-    const label = document.createElement("span");
-    label.textContent = "Min";
-    const span = document.createElement("span");
-    span.textContent = transform.temp(obj.tempMin);
-    detailsInfo.appendChild(label);
-    detailsInfo.appendChild(span);
-    const icon = document.createElement("i");
-    icon.classList.add("min-icon");
-    details.appendChild(icon);
-    details.appendChild(detailsInfo);
-    container.appendChild(details);
+};
+
+const populateForecast = {
+  forecastItems: (obj, i) => {
+    // populateWeather forcast info
+    console.log(obj);
+    const container = document.querySelector(".forecast");
+    populateForecast.forecastDetails(container, obj, i);
   },
-  tempMax: (container, obj) => {
-    const details = document.createElement("div");
-    const detailsInfo = document.createElement("div");
-    details.classList.add("weather-details");
-    detailsInfo.classList.add("details-info");
-    const label = document.createElement("span");
-    label.textContent = "Max";
-    const span = document.createElement("span");
-    span.textContent = transform.temp(obj.tempMax);
-    detailsInfo.appendChild(label);
-    detailsInfo.appendChild(span);
-    const icon = document.createElement("i");
-    icon.classList.add("max-icon");
-    details.appendChild(icon);
-    details.appendChild(detailsInfo);
-    container.appendChild(details);
+  forecastDetails: (container, obj, i) => {
+    const detailsContainer = document.createElement("div");
+    detailsContainer.classList.add("forecast-details");
+    detailsContainer.classList.add(`forecast${i}`);
+    container.appendChild(detailsContainer);
+    populateForecast.time(obj, detailsContainer);
   },
-  forecastItems: () => {
-    // populate forcast info
+  time: (obj, container) => {
+    const time = document.createElement("div");
+    time.classList.add("forecast-time");
+    time.textContent = obj.time;
+    container.appendChild(time);
+    console.log(time);
   },
 };
 
