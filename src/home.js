@@ -1,10 +1,11 @@
 export const App = {
   init: () => {
     // init creating containers and listeners
+    const units = weather.getUnits();
     const main = document.querySelector("body");
     App.wrapper(main);
-    weather.getData();
-    weather.getForecast();
+    weather.getData(units);
+    weather.getForecast(units);
     listeners.init();
   },
   wrapper: (main) => {
@@ -95,10 +96,10 @@ export const App = {
 // weather data functions
 const weather = {
   // get data from the API
-  getData: async () => {
+  getData: async (units) => {
     try {
       const response = await fetch(
-        "https://api.openweathermap.org/data/2.5/weather?q=London&APPID=3e551ddc1e7a94f0f602ed66e45dc2ba",
+        `https://api.openweathermap.org/data/2.5/weather?q=London&units=${units}&APPID=3e551ddc1e7a94f0f602ed66e45dc2ba`,
         { mode: "cors" }
       );
       const data = await response.json();
@@ -108,10 +109,10 @@ const weather = {
       console.log(err);
     }
   },
-  getForecast: async () => {
+  getForecast: async (units) => {
     try {
       const response = await fetch(
-        "https://api.openweathermap.org/data/2.5/forecast?q=London&appid=3e551ddc1e7a94f0f602ed66e45dc2ba",
+        `https://api.openweathermap.org/data/2.5/forecast?q=London&units=${units}&appid=3e551ddc1e7a94f0f602ed66e45dc2ba`,
         { mode: "cors" }
       );
       const data = await response.json();
@@ -179,6 +180,11 @@ const weather = {
     const data = weather.forecastStorage;
     return data;
   },
+  units: "metric",
+  getUnits: () => {
+    const units = weather.units;
+    return units;
+  },
 };
 
 // populate weather info-container
@@ -216,7 +222,9 @@ const weatherInfo = {
     tempcontainer.classList.add("temp-container");
     const tempBtn = document.createElement("button");
     tempBtn.classList.add("btn");
-    tempBtn.textContent = "Display in °C";
+    tempBtn.classList.add("btn-toggle");
+    weatherInfo.btnText(tempBtn);
+    tempBtn.addEventListener("click", (e) => toggle.display(e, tempBtn));
     const temperature = document.createElement("span");
     temperature.classList.add("temperature");
     temperature.textContent = transform.temp(obj.temp);
@@ -240,6 +248,14 @@ const weatherInfo = {
     searchbox.appendChild(searchicon);
     container.appendChild(searchbox);
   },
+  btnText: (btn) => {
+    const units = weather.getUnits();
+    if (units == "metric") {
+      btn.textContent = "Display in °F";
+    } else if (units == "imperial") {
+      btn.textContent = "Display in °C";
+    }
+  },
 };
 
 // populate weather details-container
@@ -247,8 +263,6 @@ const weatherDetails = {
   populate: (obj) => {
     const container = document.querySelector(".details-container");
     weatherDetails.feelsLike(container, obj);
-    //weatherDetails.tempMin(container, obj);
-    //weatherDetails.tempMax(container, obj);
     weatherDetails.humidity(container, obj);
     weatherDetails.wind(container, obj);
     weatherDetails.pressure(container, obj);
@@ -295,7 +309,7 @@ const weatherDetails = {
     const label = document.createElement("span");
     label.textContent = "Wind";
     const span = document.createElement("span");
-    span.textContent = obj.wind + " km/h";
+    span.textContent = transform.wind(obj.wind);
     detailsInfo.appendChild(label);
     detailsInfo.appendChild(span);
     const icon = document.createElement("i");
@@ -480,10 +494,14 @@ const transform = {
       date + " " + month + " " + year + " " + hour + ":" + min + ":" + sec;
     return time;
   },
-  temp: (kelvin) => {
-    let temp = kelvin - 273.15;
+  temp: (temp) => {
+    const units = weather.getUnits();
     temp = Math.round(temp * 10) / 10;
-    temp = temp + " °C";
+    if (units == "metric") {
+      temp = temp + " °C";
+    } else if (units == "imperial") {
+      temp = temp + " °F";
+    }
     return temp;
   },
   forecastTime: (value) => {
@@ -523,6 +541,16 @@ const transform = {
       day = "Saturday";
     }
     return day;
+  },
+  wind: (speed) => {
+    const units = weather.getUnits();
+    if (units == "metric") {
+      let value = speed + " m/s";
+      return value;
+    } else if (units == "imperial") {
+      let value = speed + "  mph";
+      return value;
+    }
   },
 };
 
@@ -653,5 +681,47 @@ const items = {
       container.lastChild.remove();
     }
     hourly.populate();
+  },
+};
+
+// toggle temperature
+
+const toggle = {
+  display: (e, btn) => {
+    const units = weather.getUnits();
+    console.log(units);
+    console.log(btn);
+    toggle.removeContent();
+    if (units == "imperial") {
+      console.log("change to metric");
+      weather.units = "metric";
+      toggle.dataCall();
+    } else if (units == "metric") {
+      console.log("change to imperial");
+      weather.units = "imperial";
+      toggle.dataCall();
+    }
+  },
+  removeContent: () => {
+    const container1 = document.querySelector(".info-container");
+    const container2 = document.querySelector(".details-container");
+    const container3 = document.querySelector(".forecast");
+    const child1 = container1.children.length;
+    const child2 = container2.children.length;
+    const child3 = container3.children.length;
+    for (let i = 0; i < child1; i++) {
+      container1.firstChild.remove();
+    }
+    for (let i = 0; i < child2; i++) {
+      container2.firstChild.remove();
+    }
+    for (let i = 0; i < child3; i++) {
+      container3.firstChild.remove();
+    }
+  },
+  dataCall: async () => {
+    const units = weather.getUnits();
+    await weather.getData(units);
+    await weather.getForecast(units);
   },
 };
