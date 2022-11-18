@@ -4,8 +4,8 @@ export const App = {
     const units = weather.getUnits();
     const main = document.querySelector("body");
     App.wrapper(main);
-    weather.getData(units);
-    weather.getForecast(units);
+    weather.getData(units, false);
+    weather.getForecast(units, false);
     listeners.init();
   },
   wrapper: (main) => {
@@ -96,20 +96,22 @@ export const App = {
 // weather data functions
 const weather = {
   // get data from the API
-  getData: async (units) => {
+  getData: async (units, toggle) => {
     try {
       const response = await fetch(
         `https://api.openweathermap.org/data/2.5/weather?q=London&units=${units}&APPID=3e551ddc1e7a94f0f602ed66e45dc2ba`,
         { mode: "cors" }
       );
       const data = await response.json();
-      weather.dataHandler(data);
       weather.dataStorageHandler(data);
+      if (toggle === false) {
+        weather.dataHandler(data);
+      }
     } catch (err) {
       console.log(err);
     }
   },
-  getForecast: async (units) => {
+  getForecast: async (units, toggle) => {
     try {
       const response = await fetch(
         `https://api.openweathermap.org/data/2.5/forecast?q=London&units=${units}&appid=3e551ddc1e7a94f0f602ed66e45dc2ba`,
@@ -117,7 +119,9 @@ const weather = {
       );
       const data = await response.json();
       weather.forecastStorageHandler(data);
-      weather.populateCheck();
+      if (toggle === false) {
+        weather.populateCheck();
+      }
     } catch (err) {
       console.log(err);
     }
@@ -306,6 +310,7 @@ const weatherDetails = {
     label.textContent = "Feels like";
     const span = document.createElement("span");
     span.textContent = transform.temp(obj.tempFeels);
+    span.classList.add("feels-like");
     detailsInfo.appendChild(label);
     detailsInfo.appendChild(span);
     const icon = document.createElement("i");
@@ -702,9 +707,7 @@ const items = {
 const toggle = {
   display: (e, btn) => {
     const units = weather.getUnits();
-    console.log(units);
-    console.log(btn);
-    toggle.removeContent();
+    //toggle.removeContent();
     if (units == "imperial") {
       console.log("change to metric");
       weather.units = "metric";
@@ -734,7 +737,81 @@ const toggle = {
   },
   dataCall: async () => {
     const units = weather.getUnits();
-    await weather.getData(units);
-    await weather.getForecast(units);
+    await weather.getData(units, true);
+    await weather.getForecast(units, true);
+    toggle.temp();
+  },
+  temp: () => {
+    const weatherData = weather.getDataStorage();
+    const forecastData = weather.getForecastStorage();
+    const main = document.querySelector(".temperature");
+    const temp = weatherData[0].main.temp;
+    main.textContent = transform.temp(temp);
+    const feels = document.querySelector(".feels-like");
+    const feelsLike = weatherData[0].main.feels_like;
+    feels.textContent = transform.temp(feelsLike);
+    toggle.forecast(forecastData);
+  },
+  forecast: (obj) => {
+    daily.storageNight = [];
+    daily.storageNoon = [];
+    for (let i = 0; i < obj[0].list.length; i++) {
+      let key = obj[0].list[i].dt_txt;
+      let temp = obj[0].list[i].main.temp;
+      const icon = obj[0].list[i].weather[0].icon;
+      const weekDay = transform.weekDay(key);
+      const temperature = transform.temp(temp);
+      key = transform.forecastTime(key);
+      if (key == "15:00") {
+        daily.storageNoon.push({
+          weekDay,
+          temperature,
+          icon,
+          value: "Noon",
+        });
+      } else if (key == "03:00") {
+        daily.storageNight.push({
+          weekDay,
+          temperature,
+          icon,
+          value: "Night",
+        });
+      }
+    }
+    console.log(daily.storageNoon);
+    toggle.checker();
+  },
+  checker: () => {
+    const btnActive = document.querySelector(".btn-active");
+    const btnDaily = document.querySelector(".btn-daily");
+    const btnHourly = document.querySelector(".btn-hourly");
+    if (!btnActive) {
+      // change daily format
+      toggle.dailyHandler();
+      console.log("buttons are not active");
+    } else if (btnActive) {
+      console.log("button is active now");
+      const btnDailyActive = btnDaily.classList.contains("btn-active");
+      const btnHourlyActive = btnHourly.classList.contains("btn-active");
+      if (btnDailyActive == true) {
+        toggle.dailyHandler();
+      } else if (btnHourlyActive == true) {
+        // change hourly format
+      }
+    }
+  },
+  dailyHandler: () => {
+    const noon = daily.storageNoon;
+    for (let i = 0; i < noon.length; i++) {
+      const weekDay = noon[i].weekDay;
+      const container = document.querySelector(`.forecast${weekDay}`);
+      container.children[1].textContent = noon[i].temperature;
+    }
+    const night = daily.storageNight;
+    for (let i = 0; i < night.length; i++) {
+      const weekDay = night[i].weekDay;
+      const container = document.querySelector(`.forecast${weekDay}`);
+      container.children[2].textContent = night[i].temperature;
+    }
   },
 };
