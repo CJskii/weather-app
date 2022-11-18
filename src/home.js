@@ -117,7 +117,7 @@ const weather = {
       );
       const data = await response.json();
       weather.forecastStorageHandler(data);
-      daily.populate();
+      weather.populateCheck();
     } catch (err) {
       console.log(err);
     }
@@ -184,6 +184,19 @@ const weather = {
   getUnits: () => {
     const units = weather.units;
     return units;
+  },
+  populateCheck: () => {
+    const btn = document.querySelector(".btn-active");
+    if (btn == null) {
+      daily.populate();
+    } else if (btn != null) {
+      const text = btn.textContent;
+      if (text == "Hourly") {
+        hourly.populate();
+      } else if (text == "Daily") {
+        daily.populate();
+      }
+    }
   },
 };
 
