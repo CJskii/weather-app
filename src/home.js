@@ -778,7 +778,6 @@ const toggle = {
         });
       }
     }
-    console.log(daily.storageNoon);
     toggle.checker();
   },
   checker: () => {
@@ -794,9 +793,11 @@ const toggle = {
       const btnDailyActive = btnDaily.classList.contains("btn-active");
       const btnHourlyActive = btnHourly.classList.contains("btn-active");
       if (btnDailyActive == true) {
+        // change daily format
         toggle.dailyHandler();
       } else if (btnHourlyActive == true) {
         // change hourly format
+        toggle.hourlyHandler();
       }
     }
   },
@@ -812,6 +813,16 @@ const toggle = {
       const weekDay = night[i].weekDay;
       const container = document.querySelector(`.forecast${weekDay}`);
       container.children[2].textContent = night[i].temperature;
+    }
+  },
+  hourlyHandler: () => {
+    const obj = weather.getForecastStorage();
+    const length = obj[0].list.length;
+    for (let i = 0; i < length; i++) {
+      const container = document.querySelector(`.forecast${i}`);
+      container.children[1].textContent = transform.temp(
+        obj[0].list[i].main.temp
+      );
     }
   },
 };
