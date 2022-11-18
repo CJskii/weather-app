@@ -1,7 +1,6 @@
-import { wrap } from "lodash";
-
 export const App = {
   init: () => {
+    // init creating containers and listeners
     const main = document.querySelector("body");
     App.wrapper(main);
     weather.getData();
@@ -9,7 +8,6 @@ export const App = {
     listeners.init();
   },
   wrapper: (main) => {
-    // create main container
     const wrapper = document.createElement("div");
     wrapper.classList.add("content");
     main.appendChild(wrapper);
@@ -17,7 +15,6 @@ export const App = {
     App.forecast(wrapper);
   },
   weather: (wrapper) => {
-    // create weather info container
     const weather = document.createElement("div");
     weather.classList.add("weather-container");
     wrapper.appendChild(weather);
@@ -25,7 +22,6 @@ export const App = {
     App.forecastInfo(weather);
   },
   forecast: (wrapper) => {
-    // create forecast container
     const forecast = document.createElement("div");
     forecast.classList.add("forecast-container");
     wrapper.appendChild(forecast);
@@ -61,6 +57,7 @@ export const App = {
     container.appendChild(btns);
     const slider = document.createElement("div");
     slider.classList.add("slider");
+    slider.style.display = "none";
     const left = document.createElement("i");
     left.classList.add("slide-left");
     const dot1 = document.createElement("div");
@@ -95,7 +92,9 @@ export const App = {
   },
 };
 
+// weather data functions
 const weather = {
+  // get data from the API
   getData: async () => {
     try {
       const response = await fetch(
@@ -116,14 +115,14 @@ const weather = {
         { mode: "cors" }
       );
       const data = await response.json();
-      weather.forecastHandler(data);
       weather.forecastStorageHandler(data);
+      daily.populate();
     } catch (err) {
       console.log(err);
     }
   },
+  // handle API response and initiate populating containers
   dataHandler: (obj) => {
-    //console.log(obj);
     const city = obj.name;
     const country = obj.sys.country;
     const temp = obj.main.temp;
@@ -135,7 +134,7 @@ const weather = {
     const icon = obj.weather[0].icon;
     const description = obj.weather[0].description;
     const weatherCondition = obj.weather[0].main;
-    populateWeather.weatherItems({
+    weatherInfo.populate({
       city,
       country,
       temp,
@@ -144,24 +143,14 @@ const weather = {
       description,
       weatherCondition,
     });
-    populateWeather.weatherDetails({
+    weatherDetails.populate({
       tempFeels,
       humidity,
       pressure,
       wind,
     });
   },
-  forecastHandler: (obj) => {
-    for (let i = 0; i < obj.list.length; i++) {
-      let temp = obj.list[i].main.temp;
-      const time = obj.list[i].dt_txt;
-      let tempMin = obj.list[i].main.temp_min;
-      const icon = obj.list[i].weather[0].icon;
-      temp = transform.temp(temp);
-      tempMin = transform.temp(tempMin);
-      populateForecast.forecastItems({ temp, time, icon }, i);
-    }
-  },
+  // data storage functions
   dataStorageHandler: (obj) => {
     const check = weather.getDataStorage();
     if (check.length == 0) {
@@ -190,20 +179,19 @@ const weather = {
     const data = weather.forecastStorage;
     return data;
   },
-  dailyStorageNoon: [],
-  dailyStorageNight: [],
 };
 
-const populateWeather = {
-  weatherItems: (obj) => {
+// populate weather info-container
+const weatherInfo = {
+  populate: (obj) => {
     // populateWeather weather info
     const container = document.querySelector(".info-container");
-    populateWeather.city(container, obj);
-    populateWeather.description(container, obj);
-    populateWeather.time(container, obj);
-    populateWeather.weatherIcon(container, obj);
-    populateWeather.temperature(container, obj);
-    populateWeather.searchBox(container);
+    weatherInfo.city(container, obj);
+    weatherInfo.description(container, obj);
+    weatherInfo.time(container, obj);
+    weatherInfo.weatherIcon(container, obj);
+    weatherInfo.temperature(container, obj);
+    weatherInfo.searchBox(container);
   },
   city: (container, obj) => {
     const city = document.createElement("div");
@@ -252,14 +240,18 @@ const populateWeather = {
     searchbox.appendChild(searchicon);
     container.appendChild(searchbox);
   },
-  weatherDetails: (obj) => {
+};
+
+// populate weather details-container
+const weatherDetails = {
+  populate: (obj) => {
     const container = document.querySelector(".details-container");
-    populateWeather.feelsLike(container, obj);
-    //populateWeather.tempMin(container, obj);
-    //populateWeather.tempMax(container, obj);
-    populateWeather.humidity(container, obj);
-    populateWeather.wind(container, obj);
-    populateWeather.pressure(container, obj);
+    weatherDetails.feelsLike(container, obj);
+    //weatherDetails.tempMin(container, obj);
+    //weatherDetails.tempMax(container, obj);
+    weatherDetails.humidity(container, obj);
+    weatherDetails.wind(container, obj);
+    weatherDetails.pressure(container, obj);
   },
   humidity: (container, obj) => {
     const details = document.createElement("div");
@@ -331,12 +323,22 @@ const populateWeather = {
   },
 };
 
-const populateForecast = {
-  forecastItems: (obj, i) => {
+// hourly forecast logic
+const hourly = {
+  populate: () => {
     // populateWeather forcast info
+    const obj = weather.getForecastStorage();
     const container = document.querySelector(".forecast");
-    populateForecast.forecastDetails(container, obj, i);
-    //console.log(obj);
+    for (let i = 0; i < obj[0].list.length; i++) {
+      let temp = obj[0].list[i].main.temp;
+      const time = obj[0].list[i].dt_txt;
+      let tempMin = obj[0].list[i].main.temp_min;
+      const icon = obj[0].list[i].weather[0].icon;
+      temp = transform.temp(temp);
+      tempMin = transform.temp(tempMin);
+      const object = { temp, time, icon };
+      hourly.forecastDetails(container, object, i);
+    }
   },
   forecastDetails: (container, obj, i) => {
     const detailsContainer = document.createElement("div");
@@ -348,9 +350,9 @@ const populateForecast = {
       detailsContainer.style.display = "none";
     }
     // populate forecast containers
-    populateForecast.time(obj, detailsContainer);
-    populateForecast.temp(obj, detailsContainer);
-    populateForecast.icon(obj, detailsContainer);
+    hourly.time(obj, detailsContainer);
+    hourly.temp(obj, detailsContainer);
+    hourly.icon(obj, detailsContainer);
   },
   time: (obj, container) => {
     const time = document.createElement("div");
@@ -371,10 +373,14 @@ const populateForecast = {
     transform.icon(obj.icon, icon);
     container.appendChild(icon);
   },
-  daily: () => {
+};
+
+// daily forecast logic
+const daily = {
+  populate: () => {
     const obj = weather.getForecastStorage();
-    weather.dailyStorageNight = [];
-    weather.dailyStorageNoon = [];
+    daily.storageNight = [];
+    daily.storageNoon = [];
     for (let i = 0; i < obj[0].list.length; i++) {
       let key = obj[0].list[i].dt_txt;
       let temp = obj[0].list[i].main.temp;
@@ -383,14 +389,14 @@ const populateForecast = {
       const temperature = transform.temp(temp);
       key = transform.forecastTime(key);
       if (key == "15:00") {
-        weather.dailyStorageNoon.push({
+        daily.storageNoon.push({
           weekDay,
           temperature,
           icon,
           value: "Noon",
         });
       } else if (key == "03:00") {
-        weather.dailyStorageNight.push({
+        daily.storageNight.push({
           weekDay,
           temperature,
           icon,
@@ -398,21 +404,21 @@ const populateForecast = {
         });
       }
     }
-    populateForecast.dailyContainer();
+    daily.dailyContainer();
   },
   dailyContainer: () => {
-    const noon = weather.dailyStorageNoon;
-    const night = weather.dailyStorageNight;
+    const noon = daily.storageNoon;
+    const night = daily.storageNight;
     const container = document.querySelector(".forecast");
     noon.forEach((key) => {
       const element = document.createElement("div");
       element.classList.add(`forecast${key.weekDay}`);
       element.classList.add("daily");
       container.appendChild(element);
-      populateForecast.noonPopulate(element, key);
+      daily.noonPopulate(element, key);
     });
     night.forEach((key) => {
-      populateForecast.nightPopulate(key);
+      daily.nightPopulate(key);
     });
   },
   noonPopulate: (container, key) => {
@@ -433,7 +439,7 @@ const populateForecast = {
     temp.classList.add("forecast-temp-night");
     temp.textContent = key.temperature;
     container.appendChild(temp);
-    populateForecast.dailyIcons(container, key);
+    daily.dailyIcons(container, key);
   },
   dailyIcons: (container, key) => {
     const value = key.icon;
@@ -442,8 +448,11 @@ const populateForecast = {
     container.appendChild(icon);
     transform.icon(value, icon);
   },
+  storageNoon: [],
+  storageNight: [],
 };
 
+// transform data
 const transform = {
   time: (UNIX_timestamp) => {
     var a = new Date(UNIX_timestamp * 1000);
@@ -517,6 +526,7 @@ const transform = {
   },
 };
 
+// event listeners
 const listeners = {
   init: () => {
     const left = document.querySelector(".slide-left");
@@ -526,15 +536,16 @@ const listeners = {
     const dot3 = document.querySelector(".dot3");
     const btnDaily = document.querySelector(".btn-daily");
     const btnHourly = document.querySelector(".btn-hourly");
+    const slider = document.querySelector(".slider");
     left.addEventListener("click", (e) => listeners.left(e, dot1, dot2, dot3));
     right.addEventListener("click", (e) =>
       listeners.right(e, dot1, dot2, dot3)
     );
     btnDaily.addEventListener("click", (e) =>
-      listeners.daily(e, btnDaily, btnHourly)
+      listeners.daily(e, btnDaily, btnHourly, slider)
     );
     btnHourly.addEventListener("click", (e) =>
-      listeners.hourly(e, btnDaily, btnHourly)
+      listeners.hourly(e, btnDaily, btnHourly, slider)
     );
   },
   left: (e, dot1, dot2, dot3) => {
@@ -542,7 +553,6 @@ const listeners = {
     const color2 = dot2.style.background;
     const color3 = dot3.style.background;
     if (color1 == "white") {
-      console.log("cant change me");
       return;
     } else if (color2 == "white") {
       dot1.style.background = "white";
@@ -567,25 +577,26 @@ const listeners = {
       dot2.style.background = "transparent";
       items.renderRight("3");
     } else if (color3 == "white") {
-      console.log("cant change me");
       return;
     }
   },
-  daily: (e, btn1, btn2) => {
+  daily: (e, btn1, btn2, slider) => {
     btn1.classList.add("btn-active");
     btn2.classList.remove("btn-active");
+    slider.style.display = "none";
     items.dailyForecast();
   },
-  hourly: (e, btn1, btn2) => {
+  hourly: (e, btn1, btn2, slider) => {
     btn2.classList.add("btn-active");
     btn1.classList.remove("btn-active");
+    slider.style.display = "flex";
     items.hourlyForecast();
   },
 };
 
+// forecast items logic
 const items = {
   renderRight: (value) => {
-    console.log(value);
     if (value == "2") {
       for (let i = 0; i < 6; i++) {
         const item = document.querySelector(`.forecast${i}`);
@@ -632,17 +643,15 @@ const items = {
     const length = container.children.length;
     for (let i = 0; i < length; i++) {
       container.lastChild.remove();
-      //console.log(container.children);
     }
-    populateForecast.daily();
+    daily.populate();
   },
   hourlyForecast: () => {
     const container = document.querySelector(".forecast");
     const length = container.children.length;
     for (let i = 0; i < length; i++) {
       container.lastChild.remove();
-      //console.log(container.children);
     }
-    console.log(weather.getForecastStorage());
+    hourly.populate();
   },
 };
