@@ -181,6 +181,15 @@ body {
   background-color: rgba(165, 42, 42, 0.315);
 }
 
+.daily {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 30%;
+}
+
 .forecast {
   display: flex;
   flex-direction: row;

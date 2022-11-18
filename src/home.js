@@ -1,3 +1,5 @@
+import { wrap } from "lodash";
+
 export const App = {
   init: () => {
     const main = document.querySelector("body");
@@ -188,6 +190,8 @@ const weather = {
     const data = weather.forecastStorage;
     return data;
   },
+  dailyStorageNoon: [],
+  dailyStorageNight: [],
 };
 
 const populateWeather = {
@@ -367,6 +371,77 @@ const populateForecast = {
     transform.icon(obj.icon, icon);
     container.appendChild(icon);
   },
+  daily: () => {
+    const obj = weather.getForecastStorage();
+    weather.dailyStorageNight = [];
+    weather.dailyStorageNoon = [];
+    for (let i = 0; i < obj[0].list.length; i++) {
+      let key = obj[0].list[i].dt_txt;
+      let temp = obj[0].list[i].main.temp;
+      const icon = obj[0].list[i].weather[0].icon;
+      const weekDay = transform.weekDay(key);
+      const temperature = transform.temp(temp);
+      key = transform.forecastTime(key);
+      if (key == "15:00") {
+        weather.dailyStorageNoon.push({
+          weekDay,
+          temperature,
+          icon,
+          value: "Noon",
+        });
+      } else if (key == "03:00") {
+        weather.dailyStorageNight.push({
+          weekDay,
+          temperature,
+          icon,
+          value: "Night",
+        });
+      }
+    }
+    populateForecast.dailyContainer();
+  },
+  dailyContainer: () => {
+    const noon = weather.dailyStorageNoon;
+    const night = weather.dailyStorageNight;
+    const container = document.querySelector(".forecast");
+    noon.forEach((key) => {
+      const element = document.createElement("div");
+      element.classList.add(`forecast${key.weekDay}`);
+      element.classList.add("daily");
+      container.appendChild(element);
+      populateForecast.noonPopulate(element, key);
+    });
+    night.forEach((key) => {
+      populateForecast.nightPopulate(key);
+    });
+  },
+  noonPopulate: (container, key) => {
+    const time = document.createElement("div");
+    time.classList.add("forecast-time");
+    time.textContent = key.weekDay;
+    const temp = document.createElement("div");
+    temp.classList.add("forecast-temp");
+    temp.classList.add("forecast-temp-noon");
+    temp.textContent = key.temperature;
+    container.appendChild(time);
+    container.appendChild(temp);
+  },
+  nightPopulate: (key) => {
+    const container = document.querySelector(`.forecast${key.weekDay}`);
+    const temp = document.createElement("div");
+    temp.classList.add("forecast-temp");
+    temp.classList.add("forecast-temp-night");
+    temp.textContent = key.temperature;
+    container.appendChild(temp);
+    populateForecast.dailyIcons(container, key);
+  },
+  dailyIcons: (container, key) => {
+    const value = key.icon;
+    const icon = document.createElement("img");
+    icon.classList.add("forecast-icon");
+    container.appendChild(icon);
+    transform.icon(value, icon);
+  },
 };
 
 const transform = {
@@ -403,7 +478,7 @@ const transform = {
     return temp;
   },
   forecastTime: (value) => {
-    value = value.slice(10, 16);
+    value = value.slice(11, 16);
     return value;
   },
   icon: async (value, icon) => {
@@ -418,6 +493,27 @@ const transform = {
     } catch (err) {
       console.log(err);
     }
+  },
+  weekDay: (date) => {
+    const d = new Date(date);
+    let value = d.getDay();
+    let day;
+    if (value == "0") {
+      day = "Sunday";
+    } else if (value == "1") {
+      day = "Monday";
+    } else if (value == "2") {
+      day = "Tuesday";
+    } else if (value == "3") {
+      day = "Wednesday";
+    } else if (value == "4") {
+      day = "Thursday";
+    } else if (value == "5") {
+      day = "Friday";
+    } else if (value == "6") {
+      day = "Saturday";
+    }
+    return day;
   },
 };
 
@@ -531,6 +627,22 @@ const items = {
       }
     }
   },
-  dailyForecast: () => {},
-  hourlyForecast: () => {},
+  dailyForecast: () => {
+    const container = document.querySelector(".forecast");
+    const length = container.children.length;
+    for (let i = 0; i < length; i++) {
+      container.lastChild.remove();
+      //console.log(container.children);
+    }
+    populateForecast.daily();
+  },
+  hourlyForecast: () => {
+    const container = document.querySelector(".forecast");
+    const length = container.children.length;
+    for (let i = 0; i < length; i++) {
+      container.lastChild.remove();
+      //console.log(container.children);
+    }
+    console.log(weather.getForecastStorage());
+  },
 };
