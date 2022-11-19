@@ -10,11 +10,11 @@ export const App = {
     await APIcall.fWeather();
     await APIcall.cForecast();
     await APIcall.fForecast();
-    listeners.init();
     //storage.check();
     weatherInfo.init();
     weatherDetails.init();
     daily.init();
+    listeners.init();
   },
   wrapper: (main) => {
     const wrapper = document.createElement("div");
@@ -106,8 +106,9 @@ const APIcall = {
   // get data from the API
   cWeather: async () => {
     try {
+      const city = storage.search;
       const response = await fetch(
-        "https://api.openweathermap.org/data/2.5/weather?q=London&units=metric&APPID=3e551ddc1e7a94f0f602ed66e45dc2ba",
+        `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&APPID=3e551ddc1e7a94f0f602ed66e45dc2ba`,
         { mode: "cors" }
       );
       const data = await response.json();
@@ -118,8 +119,9 @@ const APIcall = {
   },
   cForecast: async () => {
     try {
+      const city = storage.search;
       const response = await fetch(
-        "https://api.openweathermap.org/data/2.5/forecast?q=London&units=metric&appid=3e551ddc1e7a94f0f602ed66e45dc2ba",
+        `https://api.openweathermap.org/data/2.5/forecast?q=${city}&units=metric&appid=3e551ddc1e7a94f0f602ed66e45dc2ba`,
         { mode: "cors" }
       );
       const data = await response.json();
@@ -130,8 +132,9 @@ const APIcall = {
   },
   fWeather: async () => {
     try {
+      const city = storage.search;
       const response = await fetch(
-        "https://api.openweathermap.org/data/2.5/weather?q=London&units=imperial&APPID=3e551ddc1e7a94f0f602ed66e45dc2ba",
+        `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=imperial&APPID=3e551ddc1e7a94f0f602ed66e45dc2ba`,
         { mode: "cors" }
       );
       const data = await response.json();
@@ -142,8 +145,9 @@ const APIcall = {
   },
   fForecast: async () => {
     try {
+      const city = storage.search;
       const response = await fetch(
-        "https://api.openweathermap.org/data/2.5/forecast?q=London&units=imperial&appid=3e551ddc1e7a94f0f602ed66e45dc2ba",
+        `https://api.openweathermap.org/data/2.5/forecast?q=${city}&units=imperial&appid=3e551ddc1e7a94f0f602ed66e45dc2ba`,
         { mode: "cors" }
       );
       const data = await response.json();
@@ -196,6 +200,7 @@ const storage = {
   cForecast: [],
   fForecast: [],
   units: "imperial",
+  search: "London",
 };
 
 // populate weather info-container
@@ -261,7 +266,6 @@ const weatherInfo = {
     tempBtn.classList.add("btn");
     tempBtn.classList.add("toggle");
     weatherInfo.btnText(tempBtn);
-    tempBtn.addEventListener("click", (e) => toggle.init(e));
     const temperature = document.createElement("span");
     temperature.classList.add("temperature");
     temperature.textContent = transform.temp(obj.temp);
@@ -625,6 +629,9 @@ const listeners = {
     const btnDaily = document.querySelector(".btn-daily");
     const btnHourly = document.querySelector(".btn-hourly");
     const slider = document.querySelector(".slider");
+    const input = document.querySelector("input");
+    const searchIcon = document.querySelector(".search-icon");
+    const toggleBtn = document.querySelector(".toggle");
     left.addEventListener("click", (e) => listeners.left(e, dot1, dot2, dot3));
     right.addEventListener("click", (e) =>
       listeners.right(e, dot1, dot2, dot3)
@@ -635,6 +642,9 @@ const listeners = {
     btnHourly.addEventListener("click", (e) =>
       listeners.hourly(e, btnDaily, btnHourly, slider)
     );
+    toggleBtn.addEventListener("click", (e) => toggle.init(e));
+    searchIcon.addEventListener("click", (e) => search.init(e, input));
+    input.addEventListener("keypress", (e) => search.input(e, input));
   },
   left: (e, dot1, dot2, dot3) => {
     const color1 = dot1.style.background;
@@ -859,5 +869,39 @@ const toggle = {
         obj[0].list[i].main.temp
       );
     }
+  },
+};
+
+const search = {
+  init: (e, input) => {
+    const value = input.value;
+    input.value = "";
+    storage.search = value;
+    //search.data();
+  },
+  input: (e, input) => {
+    const key = e.keyCode;
+    if (key === 13) {
+      const value = input.value;
+      input.value = "";
+      storage.search = value;
+      //search.data(value);
+    } else if (key >= 33 && key <= 64) {
+      e.preventDefault();
+    } else if (key >= 123 && key <= 126) {
+      e.preventDefault();
+    } else if (key >= 91 && key <= 96) {
+      e.preventDefault();
+    }
+    console.log(storage.search);
+    search.data();
+  },
+  data: async () => {
+    await APIcall.cWeather();
+    await APIcall.fWeather();
+    await APIcall.cForecast();
+    await APIcall.fForecast();
+    console.log(storage.cWeather);
+    //search.removeContent();
   },
 };
