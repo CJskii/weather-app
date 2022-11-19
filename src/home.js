@@ -1,12 +1,20 @@
 export const App = {
-  init: () => {
+  init: async () => {
     // init creating containers and listeners
-    const units = weather.getUnits();
+    const units = storage.units;
     const main = document.querySelector("body");
     App.wrapper(main);
-    weather.getData(units, false);
-    weather.getForecast(units, false);
+    //weather.getData(units, false);
+    //weather.getForecast(units, false);
+    await APIcall.cWeather();
+    await APIcall.fWeather();
+    await APIcall.cForecast();
+    await APIcall.fForecast();
     listeners.init();
+    //storage.check();
+    weatherInfo.init();
+    weatherDetails.init();
+    daily.init();
   },
   wrapper: (main) => {
     const wrapper = document.createElement("div");
@@ -93,52 +101,121 @@ export const App = {
   },
 };
 
-// weather data functions
-const weather = {
+// API data
+const APIcall = {
   // get data from the API
-  getData: async (units, toggle) => {
+  cWeather: async () => {
     try {
       const response = await fetch(
-        `https://api.openweathermap.org/data/2.5/weather?q=London&units=${units}&APPID=3e551ddc1e7a94f0f602ed66e45dc2ba`,
+        "https://api.openweathermap.org/data/2.5/weather?q=London&units=metric&APPID=3e551ddc1e7a94f0f602ed66e45dc2ba",
         { mode: "cors" }
       );
       const data = await response.json();
-      weather.dataStorageHandler(data);
-      if (toggle === false) {
-        weather.dataHandler(data);
-      }
+      storage.init(data, "CW");
     } catch (err) {
       console.log(err);
     }
   },
-  getForecast: async (units, toggle) => {
+  cForecast: async () => {
     try {
       const response = await fetch(
-        `https://api.openweathermap.org/data/2.5/forecast?q=London&units=${units}&appid=3e551ddc1e7a94f0f602ed66e45dc2ba`,
+        "https://api.openweathermap.org/data/2.5/forecast?q=London&units=metric&appid=3e551ddc1e7a94f0f602ed66e45dc2ba",
         { mode: "cors" }
       );
       const data = await response.json();
-      weather.forecastStorageHandler(data);
-      if (toggle === false) {
-        weather.populateCheck();
-      }
+      storage.init(data, "CF");
     } catch (err) {
       console.log(err);
     }
   },
-  // handle API response and initiate populating containers
-  dataHandler: (obj) => {
-    const city = obj.name;
-    const country = obj.sys.country;
-    const temp = obj.main.temp;
-    const tempFeels = obj.main.feels_like;
-    const humidity = obj.main.humidity;
-    const pressure = obj.main.pressure;
-    const wind = obj.wind.speed;
-    const dataTime = obj.dt;
-    const icon = obj.weather[0].icon;
-    const description = obj.weather[0].description;
-    const weatherCondition = obj.weather[0].main;
+  fWeather: async () => {
+    try {
+      const response = await fetch(
+        "https://api.openweathermap.org/data/2.5/weather?q=London&units=imperial&APPID=3e551ddc1e7a94f0f602ed66e45dc2ba",
+        { mode: "cors" }
+      );
+      const data = await response.json();
+      storage.init(data, "FW");
+    } catch (err) {
+      console.log(err);
+    }
+  },
+  fForecast: async () => {
+    try {
+      const response = await fetch(
+        "https://api.openweathermap.org/data/2.5/forecast?q=London&units=imperial&appid=3e551ddc1e7a94f0f602ed66e45dc2ba",
+        { mode: "cors" }
+      );
+      const data = await response.json();
+      storage.init(data, "FF");
+    } catch (err) {
+      console.log(err);
+    }
+  },
+};
+
+// storage functions
+const storage = {
+  init: (obj, type) => {
+    if (type == "CW") {
+      const length = storage.cWeather.length;
+      if (length > 0) {
+        storage.cWeather = [];
+        storage.cWeather.push(obj);
+      } else {
+        storage.cWeather.push(obj);
+      }
+    } else if (type == "FW") {
+      const length = storage.fWeather.length;
+      if (length > 0) {
+        storage.fWeather = [];
+        storage.fWeather.push(obj);
+      } else {
+        storage.fWeather.push(obj);
+      }
+    } else if (type == "CF") {
+      const length = storage.cForecast.length;
+      if (length > 0) {
+        storage.cForecast = [];
+        storage.cForecast.push(obj);
+      } else {
+        storage.cForecast.push(obj);
+      }
+    } else if (type == "FF") {
+      const length = storage.fForecast.length;
+      if (length > 0) {
+        storage.fForecast = [];
+        storage.fForecast.push(obj);
+      } else {
+        storage.fForecast.push(obj);
+      }
+    }
+  },
+  cWeather: [],
+  fWeather: [],
+  cForecast: [],
+  fForecast: [],
+  units: "imperial",
+};
+
+// populate weather info-container
+const weatherInfo = {
+  init: () => {
+    let obj;
+    const units = storage.units;
+    if (units == "metric") {
+      obj = storage.cWeather;
+    } else if (units == "imperial") {
+      obj = storage.fWeather;
+    }
+    console.log(obj);
+    const city = obj[0].name;
+    const country = obj[0].sys.country;
+    const temp = obj[0].main.temp;
+    const dataTime = obj[0].dt;
+    const icon = obj[0].weather[0].icon;
+    const description = obj[0].weather[0].description;
+    const weatherCondition = obj[0].weather[0].main;
     weatherInfo.populate({
       city,
       country,
@@ -148,64 +225,7 @@ const weather = {
       description,
       weatherCondition,
     });
-    weatherDetails.populate({
-      tempFeels,
-      humidity,
-      pressure,
-      wind,
-    });
   },
-  // data storage functions
-  dataStorageHandler: (obj) => {
-    const check = weather.getDataStorage();
-    if (check.length == 0) {
-      weather.dataStorage.push(obj);
-    } else if (check.length > 0) {
-      weather.dataStorage = [];
-      weather.dataStorage.push(obj);
-    }
-  },
-  forecastStorageHandler: (obj) => {
-    const check = weather.getDataStorage();
-    if (check.length == 0) {
-      weather.forecastStorage.push(obj);
-    } else if (check.length > 0) {
-      weather.forecastStorage = [];
-      weather.forecastStorage.push(obj);
-    }
-  },
-  dataStorage: [],
-  forecastStorage: [],
-  getDataStorage: () => {
-    const data = weather.dataStorage;
-    return data;
-  },
-  getForecastStorage: () => {
-    const data = weather.forecastStorage;
-    return data;
-  },
-  units: "metric",
-  getUnits: () => {
-    const units = weather.units;
-    return units;
-  },
-  populateCheck: () => {
-    const btn = document.querySelector(".btn-active");
-    if (btn == null) {
-      daily.populate();
-    } else if (btn != null) {
-      const text = btn.textContent;
-      if (text == "Hourly") {
-        hourly.populate();
-      } else if (text == "Daily") {
-        daily.populate();
-      }
-    }
-  },
-};
-
-// populate weather info-container
-const weatherInfo = {
   populate: (obj) => {
     // populateWeather weather info
     const container = document.querySelector(".info-container");
@@ -239,9 +259,9 @@ const weatherInfo = {
     tempcontainer.classList.add("temp-container");
     const tempBtn = document.createElement("button");
     tempBtn.classList.add("btn");
-    tempBtn.classList.add("btn-toggle");
+    tempBtn.classList.add("toggle");
     weatherInfo.btnText(tempBtn);
-    tempBtn.addEventListener("click", (e) => toggle.display(e, tempBtn));
+    tempBtn.addEventListener("click", (e) => toggle.init(e));
     const temperature = document.createElement("span");
     temperature.classList.add("temperature");
     temperature.textContent = transform.temp(obj.temp);
@@ -266,7 +286,7 @@ const weatherInfo = {
     container.appendChild(searchbox);
   },
   btnText: (btn) => {
-    const units = weather.getUnits();
+    const units = storage.units;
     if (units == "metric") {
       btn.textContent = "Display in °F";
     } else if (units == "imperial") {
@@ -277,6 +297,20 @@ const weatherInfo = {
 
 // populate weather details-container
 const weatherDetails = {
+  init: () => {
+    let obj;
+    const units = storage.units;
+    if (units == "metric") {
+      obj = storage.cWeather;
+    } else if (units == "imperial") {
+      obj = storage.fWeather;
+    }
+    const tempFeels = obj[0].main.feels_like;
+    const humidity = obj[0].main.humidity;
+    const pressure = obj[0].main.pressure;
+    const wind = obj[0].wind.speed;
+    weatherDetails.populate({ tempFeels, humidity, pressure, wind });
+  },
   populate: (obj) => {
     const container = document.querySelector(".details-container");
     weatherDetails.feelsLike(container, obj);
@@ -327,7 +361,7 @@ const weatherDetails = {
     const label = document.createElement("span");
     label.textContent = "Wind";
     const span = document.createElement("span");
-    span.textContent = transform.wind(obj.wind);
+    span.textContent = obj.wind + " m/s";
     detailsInfo.appendChild(label);
     detailsInfo.appendChild(span);
     const icon = document.createElement("i");
@@ -357,9 +391,18 @@ const weatherDetails = {
 
 // hourly forecast logic
 const hourly = {
-  populate: () => {
+  init: () => {
+    let obj;
+    const units = storage.units;
+    if (units == "metric") {
+      obj = storage.cForecast;
+    } else if (units == "imperial") {
+      obj = storage.fForecast;
+    }
+    hourly.populate(obj);
+  },
+  populate: (obj) => {
     // populateWeather forcast info
-    const obj = weather.getForecastStorage();
     const container = document.querySelector(".forecast");
     for (let i = 0; i < obj[0].list.length; i++) {
       let temp = obj[0].list[i].main.temp;
@@ -409,8 +452,17 @@ const hourly = {
 
 // daily forecast logic
 const daily = {
-  populate: () => {
-    const obj = weather.getForecastStorage();
+  init: () => {
+    let obj;
+    const units = storage.units;
+    if (units == "metric") {
+      obj = storage.cForecast;
+    } else if (units == "imperial") {
+      obj = storage.fForecast;
+    }
+    daily.populate(obj);
+  },
+  populate: (obj) => {
     daily.storageNight = [];
     daily.storageNoon = [];
     for (let i = 0; i < obj[0].list.length; i++) {
@@ -513,7 +565,7 @@ const transform = {
     return time;
   },
   temp: (temp) => {
-    const units = weather.getUnits();
+    const units = storage.units;
     temp = Math.round(temp * 10) / 10;
     if (units == "metric") {
       temp = temp + " °C";
@@ -559,16 +611,6 @@ const transform = {
       day = "Saturday";
     }
     return day;
-  },
-  wind: (speed) => {
-    const units = weather.getUnits();
-    if (units == "metric") {
-      let value = speed + " m/s";
-      return value;
-    } else if (units == "imperial") {
-      let value = speed + "  mph";
-      return value;
-    }
   },
 };
 
@@ -690,7 +732,7 @@ const items = {
     for (let i = 0; i < length; i++) {
       container.lastChild.remove();
     }
-    daily.populate();
+    daily.init();
   },
   hourlyForecast: () => {
     const container = document.querySelector(".forecast");
@@ -698,59 +740,48 @@ const items = {
     for (let i = 0; i < length; i++) {
       container.lastChild.remove();
     }
-    hourly.populate();
+    hourly.init();
   },
 };
 
 // toggle temperature
 
 const toggle = {
-  display: (e, btn) => {
-    const units = weather.getUnits();
-    //toggle.removeContent();
+  init: () => {
+    const units = storage.units;
+    const btn = document.querySelector(".toggle");
     if (units == "imperial") {
       console.log("change to metric");
-      weather.units = "metric";
-      toggle.dataCall();
+      storage.units = "metric";
+      btn.textContent = "Display in °F";
+      toggle.dataCall("C");
     } else if (units == "metric") {
       console.log("change to imperial");
-      weather.units = "imperial";
-      toggle.dataCall();
+      storage.units = "imperial";
+      btn.textContent = "Display in °C";
+      toggle.dataCall("F");
     }
   },
-  removeContent: () => {
-    const container1 = document.querySelector(".info-container");
-    const container2 = document.querySelector(".details-container");
-    const container3 = document.querySelector(".forecast");
-    const child1 = container1.children.length;
-    const child2 = container2.children.length;
-    const child3 = container3.children.length;
-    for (let i = 0; i < child1; i++) {
-      container1.firstChild.remove();
+  dataCall: async (display) => {
+    let weatherData;
+    let forecastData;
+    if (display == "C") {
+      weatherData = storage.cWeather;
+      forecastData = storage.cForecast;
+    } else if (display == "F") {
+      weatherData = storage.fWeather;
+      forecastData = storage.fForecast;
     }
-    for (let i = 0; i < child2; i++) {
-      container2.firstChild.remove();
-    }
-    for (let i = 0; i < child3; i++) {
-      container3.firstChild.remove();
-    }
+    toggle.temp(weatherData);
+    toggle.forecast(forecastData);
   },
-  dataCall: async () => {
-    const units = weather.getUnits();
-    await weather.getData(units, true);
-    await weather.getForecast(units, true);
-    toggle.temp();
-  },
-  temp: () => {
-    const weatherData = weather.getDataStorage();
-    const forecastData = weather.getForecastStorage();
+  temp: (obj) => {
     const main = document.querySelector(".temperature");
-    const temp = weatherData[0].main.temp;
+    const temp = obj[0].main.temp;
     main.textContent = transform.temp(temp);
     const feels = document.querySelector(".feels-like");
-    const feelsLike = weatherData[0].main.feels_like;
+    const feelsLike = obj[0].main.feels_like;
     feels.textContent = transform.temp(feelsLike);
-    toggle.forecast(forecastData);
   },
   forecast: (obj) => {
     daily.storageNight = [];
@@ -778,7 +809,7 @@ const toggle = {
         });
       }
     }
-    toggle.checker();
+    toggle.checker(obj);
   },
   checker: () => {
     const btnActive = document.querySelector(".btn-active");
@@ -787,9 +818,7 @@ const toggle = {
     if (!btnActive) {
       // change daily format
       toggle.dailyHandler();
-      console.log("buttons are not active");
     } else if (btnActive) {
-      console.log("button is active now");
       const btnDailyActive = btnDaily.classList.contains("btn-active");
       const btnHourlyActive = btnHourly.classList.contains("btn-active");
       if (btnDailyActive == true) {
@@ -816,7 +845,13 @@ const toggle = {
     }
   },
   hourlyHandler: () => {
-    const obj = weather.getForecastStorage();
+    let obj;
+    const units = storage.units;
+    if (units == "metric") {
+      obj = storage.cForecast;
+    } else if (units == "imperial") {
+      obj = storage.fForecast;
+    }
     const length = obj[0].list.length;
     for (let i = 0; i < length; i++) {
       const container = document.querySelector(`.forecast${i}`);
