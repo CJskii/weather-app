@@ -877,7 +877,7 @@ const search = {
     const value = input.value;
     input.value = "";
     storage.search = value;
-    //search.data();
+    search.data();
   },
   input: (e, input) => {
     const key = e.keyCode;
@@ -885,7 +885,7 @@ const search = {
       const value = input.value;
       input.value = "";
       storage.search = value;
-      //search.data(value);
+      search.data();
     } else if (key >= 33 && key <= 64) {
       e.preventDefault();
     } else if (key >= 123 && key <= 126) {
@@ -894,7 +894,6 @@ const search = {
       e.preventDefault();
     }
     console.log(storage.search);
-    search.data();
   },
   data: async () => {
     await APIcall.cWeather();
@@ -902,6 +901,30 @@ const search = {
     await APIcall.cForecast();
     await APIcall.fForecast();
     console.log(storage.cWeather);
-    //search.removeContent();
+    search.removeContent();
+  },
+  removeContent: () => {
+    const container1 = document.querySelector(".info-container");
+    const container2 = document.querySelector(".details-container");
+    const container3 = document.querySelector(".forecast");
+    const child1 = container1.children.length;
+    const child2 = container2.children.length;
+    const child3 = container3.children.length;
+    for (let i = 0; i < child1; i++) {
+      container1.firstChild.remove();
+    }
+    for (let i = 0; i < child2; i++) {
+      container2.firstChild.remove();
+    }
+    for (let i = 0; i < child3; i++) {
+      container3.firstChild.remove();
+    }
+    search.newData();
+  },
+  newData: () => {
+    weatherInfo.init();
+    weatherDetails.init();
+    daily.init();
+    listeners.init();
   },
 };
