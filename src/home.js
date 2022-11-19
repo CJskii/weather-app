@@ -1,16 +1,12 @@
 export const App = {
   init: async () => {
     // init creating containers and listeners
-    const units = storage.units;
     const main = document.querySelector("body");
     App.wrapper(main);
-    //weather.getData(units, false);
-    //weather.getForecast(units, false);
     await APIcall.cWeather();
     await APIcall.fWeather();
     await APIcall.cForecast();
     await APIcall.fForecast();
-    //storage.check();
     weatherInfo.init();
     weatherDetails.init();
     daily.init();
@@ -199,7 +195,7 @@ const storage = {
   fWeather: [],
   cForecast: [],
   fForecast: [],
-  units: "imperial",
+  units: "metric",
   search: "London",
 };
 
@@ -427,6 +423,8 @@ const hourly = {
     if (i >= 6) {
       // how many forecast details is displayed
       detailsContainer.style.display = "none";
+    } else if (i < 6) {
+      detailsContainer.style.display = "flex";
     }
     // populate forecast containers
     hourly.time(obj, detailsContainer);
@@ -620,7 +618,7 @@ const transform = {
 
 // event listeners
 const listeners = {
-  init: () => {
+  init: (value) => {
     const left = document.querySelector(".slide-left");
     const right = document.querySelector(".slide-right");
     const dot1 = document.querySelector(".dot1");
@@ -632,10 +630,14 @@ const listeners = {
     const input = document.querySelector("input");
     const searchIcon = document.querySelector(".search-icon");
     const toggleBtn = document.querySelector(".toggle");
-    left.addEventListener("click", (e) => listeners.left(e, dot1, dot2, dot3));
-    right.addEventListener("click", (e) =>
-      listeners.right(e, dot1, dot2, dot3)
-    );
+    if (!value) {
+      left.addEventListener("click", (e) =>
+        listeners.left(e, dot1, dot2, dot3)
+      );
+      right.addEventListener("click", (e) =>
+        listeners.right(e, dot1, dot2, dot3)
+      );
+    }
     btnDaily.addEventListener("click", (e) =>
       listeners.daily(e, btnDaily, btnHourly, slider)
     );
@@ -944,8 +946,21 @@ const search = {
       } else if (btnHourlyActive == true) {
         // change hourly format
         hourly.init();
+        search.sliderReset();
       }
     }
-    listeners.init();
+    listeners.init("value");
+  },
+  sliderReset: () => {
+    const dot1 = document.querySelector(".dot1");
+    const dot2 = document.querySelector(".dot2");
+    const dot3 = document.querySelector(".dot3");
+    const color2 = dot2.style.background;
+    const color3 = dot3.style.background;
+    if (color2 == "white" || color3 == "white") {
+      dot2.style.background = "transparent";
+      dot3.style.background = "transparent";
+      dot1.style.background = "white";
+    }
   },
 };
