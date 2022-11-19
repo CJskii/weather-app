@@ -924,7 +924,28 @@ const search = {
   newData: () => {
     weatherInfo.init();
     weatherDetails.init();
-    daily.init();
+    search.checkAppState();
+  },
+  checkAppState: () => {
+    const btnActive = document.querySelector(".btn-active");
+    const btnDaily = document.querySelector(".btn-daily");
+    const btnHourly = document.querySelector(".btn-hourly");
+    if (!btnActive) {
+      // change daily format
+      daily.init();
+      console.log("buttons are not active");
+    } else if (btnActive) {
+      console.log("button is active now");
+      const btnDailyActive = btnDaily.classList.contains("btn-active");
+      const btnHourlyActive = btnHourly.classList.contains("btn-active");
+      if (btnDailyActive == true) {
+        // change daily format
+        daily.init();
+      } else if (btnHourlyActive == true) {
+        // change hourly format
+        hourly.init();
+      }
+    }
     listeners.init();
   },
 };
