@@ -209,7 +209,6 @@ const weatherInfo = {
     } else if (units == "imperial") {
       obj = storage.fWeather;
     }
-    console.log(obj);
     const city = obj[0].name;
     const country = obj[0].sys.country;
     const temp = obj[0].main.temp;
@@ -279,6 +278,7 @@ const weatherInfo = {
     const searchbox = document.createElement("div");
     searchbox.classList.add("search-container");
     const inp = document.createElement("input");
+    inp.placeholder = "Enter city";
     const searchicon = document.createElement("i");
     searchicon.classList.add("search-icon");
     searchbox.appendChild(inp);
@@ -496,6 +496,8 @@ const daily = {
     const noon = daily.storageNoon;
     const night = daily.storageNight;
     const container = document.querySelector(".forecast");
+    const firstNoon = noon[0].weekDay;
+    const firstNight = night[0].weekDay;
     noon.forEach((key) => {
       const element = document.createElement("div");
       element.classList.add(`forecast${key.weekDay}`);
@@ -503,9 +505,21 @@ const daily = {
       container.appendChild(element);
       daily.noonPopulate(element, key);
     });
-    night.forEach((key) => {
-      daily.nightPopulate(key);
-    });
+    // check if first day in the storages match
+    if (firstNoon == firstNight) {
+      night.forEach((key) => {
+        daily.nightPopulate(key);
+      });
+    } else if (firstNoon != firstNight) {
+      // do this if first days don't match
+      for (let i = 0; i < night.length - 1; i++) {
+        const key = night[i];
+        daily.nightPopulate(key);
+      }
+      const key = noon[0];
+      const container = document.querySelector(`.forecast${key.weekDay}`);
+      daily.dailyIcons(container, key);
+    }
   },
   noonPopulate: (container, key) => {
     const time = document.createElement("div");
@@ -521,11 +535,15 @@ const daily = {
   nightPopulate: (key) => {
     const container = document.querySelector(`.forecast${key.weekDay}`);
     const temp = document.createElement("div");
+    if (container) {
+      container.appendChild(temp);
+      daily.dailyIcons(container, key);
+    } else if (!container) {
+      daily.dailyIcons(container, key);
+    }
     temp.classList.add("forecast-temp");
     temp.classList.add("forecast-temp-night");
     temp.textContent = key.temperature;
-    container.appendChild(temp);
-    daily.dailyIcons(container, key);
   },
   dailyIcons: (container, key) => {
     const value = key.icon;
@@ -847,13 +865,17 @@ const toggle = {
     for (let i = 0; i < noon.length; i++) {
       const weekDay = noon[i].weekDay;
       const container = document.querySelector(`.forecast${weekDay}`);
-      container.children[1].textContent = noon[i].temperature;
+      if (container) {
+        container.children[1].textContent = noon[i].temperature;
+      }
     }
     const night = daily.storageNight;
     for (let i = 0; i < night.length; i++) {
       const weekDay = night[i].weekDay;
       const container = document.querySelector(`.forecast${weekDay}`);
-      container.children[2].textContent = night[i].temperature;
+      if (container) {
+        container.children[2].textContent = night[i].temperature;
+      }
     }
   },
   hourlyHandler: () => {
