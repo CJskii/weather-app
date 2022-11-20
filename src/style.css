@@ -3,6 +3,35 @@
   margin: 0;
 }
 
+:root {
+  --color1: #1a9788;
+  --color2: #564838;
+  --color3: #f0b479;
+  --color3-reduced: #f0b479be;
+  --color4: #47190859;
+  --color5: #a4a87898;
+}
+
+@font-face {
+  font-family: Orbitron;
+  src: url(./fonts/Orbitron-VariableFont_wght.ttf);
+}
+
+@font-face {
+  font-family: Lora;
+  src: url(./fonts/Lora-VariableFont_wght.ttf);
+}
+
+@font-face {
+  font-family: Mochit;
+  src: url(./fonts/MochiyPopOne-Regular.ttf);
+}
+
+@font-face {
+  font-family: Ubuntu;
+  src: url(./fonts/Ubuntu-Regular.ttf);
+}
+
 body {
   display: flex;
   justify-content: center;
@@ -14,13 +43,13 @@ body {
 }
 
 .content {
-  background-color: rgba(0, 0, 0, 0.26);
-  width: 90vw;
-  height: 90vh;
+  width: 100vw;
+  height: 100vh;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   align-items: center;
+  background-color: rgba(0, 0, 0, 0.5);
 }
 
 /* WEATHER CONTAINER (TOP) */
@@ -32,38 +61,61 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  background: var(--color4);
+  box-shadow: 0 12px 12px 12px #47190859;
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  padding: 1rem 0;
+  margin-top: 2rem;
 }
 
 .info-container,
 .details-container {
-  width: 40%;
+  width: fit-content;
   height: 100%;
-  background-color: rgba(0, 255, 255, 0.226);
 }
 
 .info-container {
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
-  justify-content: flex-start;
-  gap: 10px;
+  justify-content: space-evenly;
+  padding: 1rem;
 }
 
 .city {
-  font-size: 2rem;
+  font-size: 1.5rem;
+  font-family: Mochit, sans-serif;
+  color: var(--color3-reduced);
 }
 
 .description {
-  font-size: 1.6rem;
+  font-size: 2rem;
+  font-family: Mochit, sans-serif;
+  color: var(--color3-reduced);
+}
+
+.day {
+  font-style: italic;
+  font-family: Ubuntu, sans-serif;
+  font-size: 1.4rem;
+  color: var(--color5);
 }
 
 .time {
-  font-size: 1rem;
+  font-size: 1.2rem;
   font-style: italic;
+  font-family: Ubuntu, sans-serif;
+  color: var(--color5);
 }
 
 .temperature {
-  font-size: 1.4rem;
+  font-size: 2.5rem;
+  font-family: Ubuntu, sans-serif;
+  margin-bottom: 1rem;
+  color: var(--color3);
+  padding-left: 0.3rem;
 }
 
 .temp-container {
@@ -77,17 +129,42 @@ body {
   display: flex;
   justify-content: flex-start;
   align-items: center;
+  border-bottom: 2px solid var(--color3);
+  width: fit-content;
+  margin-left: 0.2rem;
+  margin-top: 0.5rem;
 }
 
 .search-icon {
   content: url(./img/search_icon.svg);
-  width: 35px;
-  height: 35px;
+  width: 50px;
+  height: 50px;
 }
 
 .weather-icon {
-  width: 100px;
-  height: 100px;
+  width: 125px;
+  height: 125px;
+}
+
+input {
+  font-family: Ubuntu, sans-serif;
+  background: transparent;
+  border: none;
+  padding-left: 0.4rem;
+  width: 200px;
+  height: 50px;
+  font-size: 2rem;
+  color: var(--color1);
+}
+
+input:active,
+input:focus {
+  outline: none;
+}
+
+input::placeholder {
+  color: var(--color5);
+  font-size: 2rem;
 }
 
 /* DETAILS CONTAINER RIGHT TOP */
@@ -95,9 +172,10 @@ body {
 .details-container {
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
+  justify-content: space-between;
   align-items: flex-end;
-  gap: 10px;
+  padding: 1rem;
+  width: fit-content;
 }
 
 .weather-details {
@@ -113,36 +191,48 @@ body {
   flex-direction: column;
   justify-content: center;
   align-items: flex-end;
-  width: 70px;
 }
 
 .details-info > span:first-child {
-  color: white;
+  color: var(--color5);
   font-weight: bold;
+  font-size: 2rem;
+  font-family: Ubuntu, sans-serif;
+  font-style: italic;
+}
+
+.details-info > span:nth-child(2) {
+  color: var(--color3);
+  font-size: 1.6rem;
+  font-family: Ubuntu, sans-serif;
 }
 
 .humidity-icon {
   content: url(./img/humidity_icon.svg);
-  width: 35px;
-  height: 35px;
+  width: 50px;
+  height: 50px;
+  margin-right: 0.4rem;
 }
 
 .feelslike-icon {
   content: url(./img/max-icon.svg);
-  width: 35px;
-  height: 35px;
+  width: 50px;
+  height: 50px;
+  margin-right: 0.5rem;
 }
 
 .wind-icon {
   content: url(./img/wind-icon.svg);
-  width: 35px;
-  height: 35px;
+  width: 50px;
+  height: 50px;
+  margin-right: 2.3rem;
 }
 
 .pressure-icon {
   content: url(./img/pressure-icon.svg);
-  width: 35px;
-  height: 35px;
+  width: 50px;
+  height: 50px;
+  margin-right: 0.5rem;
 }
 
 .min-icon {
@@ -161,24 +251,29 @@ body {
 
 .forecast-container {
   width: 90%;
-  height: 30%;
+  height: fit-content;
   background-color: rgba(165, 101, 18, 0.274);
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  background: var(--color4);
+  box-shadow: 0 12px 12px 12px #47190859;
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  margin-bottom: 3rem;
 }
 
 .forecast-change {
   width: 100%;
   height: 30%;
-  background-color: rgba(0, 0, 255, 0.308);
 }
 
 .forecast-container-daily {
   width: 100%;
   height: 70%;
-  background-color: rgba(165, 42, 42, 0.315);
 }
 
 .daily {
@@ -186,8 +281,9 @@ body {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: 100%;
+  height: fit-content;
   width: 30%;
+  padding-top: 1rem;
 }
 
 .forecast {
@@ -204,7 +300,39 @@ body {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  gap: 15px;
+  margin-top: 1rem;
+}
+
+.forecast-time {
+  color: var(--color5);
+  font-size: 2rem;
+  font-weight: bold;
+  font-style: italic;
+  font-family: Ubuntu, sans-serif;
+}
+
+.forecast-day {
+  color: var(--color5);
+  font-family: Ubuntu, sans-serif;
+  padding-bottom: 1rem;
+}
+
+.forecast-temp {
+  font-family: Ubuntu, sans-serif;
+  font-size: 1.6rem;
+  color: var(--color3);
+}
+
+.forecast-temp-noon {
+  font-size: 1.6rem;
+  padding-top: 1rem;
+  font-family: Ubuntu, sans-serif;
+}
+
+.forecast-temp-night {
+  padding-top: 0.4rem;
+  font-size: 1rem;
+  font-family: Ubuntu, sans-serif;
 }
 
 /* SLIDER */
@@ -214,6 +342,9 @@ body {
   justify-content: flex-start;
   align-items: center;
   gap: 10px;
+  height: fit-content;
+  border-bottom: 2px solid #cc816573;
+  width: 95%;
 }
 
 .slider {
