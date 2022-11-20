@@ -751,6 +751,13 @@ const listeners = {
     }
   },
   daily: (e, btn1, btn2, slider) => {
+    const dot1 = document.querySelector(".dot1");
+    const dot2 = document.querySelector(".dot2");
+    const dot3 = document.querySelector(".dot3");
+    dot1.style.background = "white";
+    dot2.style.background = "transparent";
+    dot3.style.background = "transparent";
+    storage.slider = "";
     btn1.classList.add("btn-active");
     btn2.classList.remove("btn-active");
     slider.style.display = "none";
@@ -1006,17 +1013,25 @@ const toggle = {
 const search = {
   init: (e, input) => {
     const value = input.value;
-    input.value = "";
-    storage.search = value;
-    search.data();
-  },
-  input: (e, input) => {
-    const key = e.keyCode;
-    if (key === 13) {
-      const value = input.value;
+    if (value == "") {
+      e.preventDefault();
+    } else {
       input.value = "";
       storage.search = value;
       search.data();
+    }
+  },
+  input: (e, input) => {
+    const key = e.keyCode;
+    const value = input.value;
+    if (key === 13) {
+      if (value == "") {
+        e.preventDefault();
+      } else {
+        input.value = "";
+        storage.search = value;
+        search.data();
+      }
     } else if (key >= 33 && key <= 64) {
       e.preventDefault();
     } else if (key >= 123 && key <= 126) {
