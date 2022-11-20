@@ -65,27 +65,25 @@ export const App = {
     slider.style.display = "none";
     const left = document.createElement("i");
     left.classList.add("slide-left");
+    const dots = [];
     const dot1 = document.createElement("div");
     const dot2 = document.createElement("div");
     const dot3 = document.createElement("div");
-    dot1.style.background = "white";
-    dot1.style.border = "2px solid white";
-    dot2.style.background = "transparent";
-    dot2.style.border = "2px solid white";
-    dot3.style.background = "transparent";
-    dot3.style.border = "2px solid white";
-    dot1.classList.add("dot");
-    dot1.classList.add("dot1");
-    dot2.classList.add("dot");
-    dot2.classList.add("dot2");
-    dot3.classList.add("dot");
-    dot3.classList.add("dot3");
+    dots.push(dot1, dot2, dot3);
+    for (let i = 0; i < dots.length; i++) {
+      dots[i].classList.add("dot");
+      dots[i].classList.add(`dot${i + 1}`);
+      dots[i].style.border = "2px solid white";
+      if (i == 0) {
+        dots[i].style.background = "white";
+      } else if (i > 0) {
+        dots[i].style.background = "transparent";
+      }
+      slider.appendChild(dots[i]);
+    }
     const right = document.createElement("i");
     right.classList.add("slide-right");
     slider.appendChild(left);
-    slider.appendChild(dot1);
-    slider.appendChild(dot2);
-    slider.appendChild(dot3);
     slider.appendChild(right);
     container.appendChild(slider);
   },
@@ -197,6 +195,7 @@ const storage = {
   fForecast: [],
   units: "metric",
   search: "London",
+  slider: "",
 };
 
 // populate weather info-container
@@ -229,8 +228,9 @@ const weatherInfo = {
   populate: (obj) => {
     // populateWeather weather info
     const container = document.querySelector(".info-container");
-    weatherInfo.city(container, obj);
     weatherInfo.description(container, obj);
+    weatherInfo.city(container, obj);
+    weatherInfo.day(container);
     weatherInfo.time(container, obj);
     weatherInfo.weatherIcon(container, obj);
     weatherInfo.temperature(container, obj);
@@ -245,11 +245,17 @@ const weatherInfo = {
   description: (container, obj) => {
     const description = document.createElement("div");
     description.classList.add("description");
-    description.textContent = obj.weatherCondition;
+    description.textContent = transform.firstLetter(obj.description);
     container.appendChild(description);
   },
+  day: (container) => {
+    const day = document.createElement("span");
+    day.classList.add("day");
+    day.textContent = transform.getDay();
+    container.appendChild(day);
+  },
   time: (container, obj) => {
-    const time = document.createElement("div");
+    const time = document.createElement("span");
     time.classList.add("time");
     time.textContent = transform.time(obj.dataTime);
     container.appendChild(time);
@@ -409,9 +415,12 @@ const hourly = {
       const time = obj[0].list[i].dt_txt;
       let tempMin = obj[0].list[i].main.temp_min;
       const icon = obj[0].list[i].weather[0].icon;
+      const dt = obj[0].list[i].dt;
       temp = transform.temp(temp);
       tempMin = transform.temp(tempMin);
-      const object = { temp, time, icon };
+      let day = transform.time(dt);
+      day = transform.weekDay(day);
+      const object = { temp, time, icon, day };
       hourly.forecastDetails(container, object, i);
     }
   },
@@ -428,6 +437,7 @@ const hourly = {
     }
     // populate forecast containers
     hourly.time(obj, detailsContainer);
+    hourly.day(obj, detailsContainer);
     hourly.temp(obj, detailsContainer);
     hourly.icon(obj, detailsContainer);
   },
@@ -449,6 +459,12 @@ const hourly = {
     icon.classList.add("forecast-icon");
     transform.icon(obj.icon, icon);
     container.appendChild(icon);
+  },
+  day: (obj, container) => {
+    const day = document.createElement("span");
+    day.classList.add("forecast-day");
+    day.textContent = obj.day;
+    container.appendChild(day);
   },
 };
 
@@ -559,8 +575,8 @@ const daily = {
 // transform data
 const transform = {
   time: (UNIX_timestamp) => {
-    var a = new Date(UNIX_timestamp * 1000);
-    var months = [
+    const a = new Date(UNIX_timestamp * 1000);
+    const months = [
       "Jan",
       "Feb",
       "Mar",
@@ -574,14 +590,12 @@ const transform = {
       "Nov",
       "Dec",
     ];
-    var year = a.getFullYear();
-    var month = months[a.getMonth()];
-    var date = a.getDate();
-    var hour = a.getHours();
-    var min = a.getMinutes();
-    var sec = a.getSeconds();
-    var time =
-      date + " " + month + " " + year + " " + hour + ":" + min + ":" + sec;
+    const year = a.getFullYear();
+    const month = months[a.getMonth()];
+    const date = a.getDate();
+    const hour = a.getHours();
+    const min = a.getMinutes();
+    const time = date + " " + month + " " + year + " " + hour + ":" + min;
     return time;
   },
   temp: (temp) => {
@@ -632,6 +646,14 @@ const transform = {
     }
     return day;
   },
+  firstLetter: (string) => {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+  },
+  getDay: () => {
+    const start = Date.now();
+    const now = transform.weekDay(start);
+    return now;
+  },
 };
 
 // event listeners
@@ -670,7 +692,22 @@ const listeners = {
     const color1 = dot1.style.background;
     const color2 = dot2.style.background;
     const color3 = dot3.style.background;
-    if (color1 == "white") {
+    if (storage.slider == "extend") {
+      if (color1 == "white") {
+        storage.slider = "";
+        dot1.style.background = "transparent";
+        dot3.style.background = "white";
+        items.renderLeft("3");
+      } else if (color2 == "white") {
+        dot2.style.background = "transparent";
+        dot1.style.background = "white";
+        items.renderLeft("4");
+      } else if (color3 == "white") {
+        dot3.style.background = "transparent";
+        dot2.style.background = "white";
+        items.renderLeft("5");
+      }
+    } else if (color1 == "white") {
       return;
     } else if (color2 == "white") {
       dot1.style.background = "white";
@@ -686,7 +723,19 @@ const listeners = {
     const color1 = dot1.style.background;
     const color2 = dot2.style.background;
     const color3 = dot3.style.background;
-    if (color1 == "white") {
+    if (storage.slider == "extend") {
+      if (color3 == "white") {
+        return console.log("pause");
+      } else if (color1 == "white") {
+        dot1.style.background = "transparent";
+        dot2.style.background = "white";
+        items.renderRight("5");
+      } else if (color2 == "white") {
+        dot2.style.background = "transparent";
+        dot3.style.background = "white";
+        items.renderRight("6");
+      }
+    } else if (color1 == "white" && storage.slider == "") {
       dot1.style.background = "transparent";
       dot2.style.background = "white";
       items.renderRight("2");
@@ -695,7 +744,10 @@ const listeners = {
       dot2.style.background = "transparent";
       items.renderRight("3");
     } else if (color3 == "white") {
-      return;
+      dot1.style.background = "white";
+      dot3.style.background = "transparent";
+      storage.slider = "extend";
+      items.renderRight("4");
     }
   },
   daily: (e, btn1, btn2, slider) => {
@@ -733,6 +785,33 @@ const items = {
         const item = document.querySelector(`.forecast${i}`);
         item.style.display = "flex";
       }
+    } else if (value == "4") {
+      for (let i = 12; i < 18; i++) {
+        const item = document.querySelector(`.forecast${i}`);
+        item.style.display = "none";
+      }
+      for (let i = 18; i < 24; i++) {
+        const item = document.querySelector(`.forecast${i}`);
+        item.style.display = "flex";
+      }
+    } else if (value == "5") {
+      for (let i = 18; i < 24; i++) {
+        const item = document.querySelector(`.forecast${i}`);
+        item.style.display = "none";
+      }
+      for (let i = 24; i < 30; i++) {
+        const item = document.querySelector(`.forecast${i}`);
+        item.style.display = "flex";
+      }
+    } else if (value == "6") {
+      for (let i = 24; i < 30; i++) {
+        const item = document.querySelector(`.forecast${i}`);
+        item.style.display = "none";
+      }
+      for (let i = 30; i < 36; i++) {
+        const item = document.querySelector(`.forecast${i}`);
+        item.style.display = "flex";
+      }
     }
   },
   renderLeft: (value) => {
@@ -751,6 +830,33 @@ const items = {
         item.style.display = "none";
       }
       for (let i = 0; i < 6; i++) {
+        const item = document.querySelector(`.forecast${i}`);
+        item.style.display = "flex";
+      }
+    } else if (value == "3") {
+      for (let i = 18; i < 24; i++) {
+        const item = document.querySelector(`.forecast${i}`);
+        item.style.display = "none";
+      }
+      for (let i = 12; i < 18; i++) {
+        const item = document.querySelector(`.forecast${i}`);
+        item.style.display = "flex";
+      }
+    } else if (value == "4") {
+      for (let i = 24; i < 30; i++) {
+        const item = document.querySelector(`.forecast${i}`);
+        item.style.display = "none";
+      }
+      for (let i = 18; i < 24; i++) {
+        const item = document.querySelector(`.forecast${i}`);
+        item.style.display = "flex";
+      }
+    } else if (value == "5") {
+      for (let i = 30; i < 36; i++) {
+        const item = document.querySelector(`.forecast${i}`);
+        item.style.display = "none";
+      }
+      for (let i = 24; i < 30; i++) {
         const item = document.querySelector(`.forecast${i}`);
         item.style.display = "flex";
       }
@@ -887,9 +993,10 @@ const toggle = {
       obj = storage.fForecast;
     }
     const length = obj[0].list.length;
+    console.log(length);
     for (let i = 0; i < length; i++) {
       const container = document.querySelector(`.forecast${i}`);
-      container.children[1].textContent = transform.temp(
+      container.children[2].textContent = transform.temp(
         obj[0].list[i].main.temp
       );
     }
