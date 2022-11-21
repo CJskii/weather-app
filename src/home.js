@@ -1104,7 +1104,9 @@ const search = {
     const dot3 = document.querySelector(".dot3");
     const color2 = dot2.style.background;
     const color3 = dot3.style.background;
-    if (color2 == "#a4a87898" || color3 == "#a4a87898") {
+    const color = storage.dotColor;
+    storage.slider = "";
+    if (color2 == color || color3 == color) {
       dot2.style.background = "transparent";
       dot3.style.background = "transparent";
       dot1.style.background = "#a4a87898";
