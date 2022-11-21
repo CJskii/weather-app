@@ -73,9 +73,9 @@ export const App = {
     for (let i = 0; i < dots.length; i++) {
       dots[i].classList.add("dot");
       dots[i].classList.add(`dot${i + 1}`);
-      dots[i].style.border = "2px solid white";
+      dots[i].style.border = "2px solid #f0b479be";
       if (i == 0) {
-        dots[i].style.background = "white";
+        dots[i].style.background = "#a4a87898";
       } else if (i > 0) {
         dots[i].style.background = "transparent";
       }
@@ -196,6 +196,7 @@ const storage = {
   units: "metric",
   search: "London",
   slider: "",
+  dotColor: "rgba(164, 168, 120, 0.596)",
 };
 
 // populate weather info-container
@@ -692,29 +693,30 @@ const listeners = {
     const color1 = dot1.style.background;
     const color2 = dot2.style.background;
     const color3 = dot3.style.background;
+    const color = storage.dotColor;
     if (storage.slider == "extend") {
-      if (color1 == "white") {
+      if (color1 == color) {
         storage.slider = "";
         dot1.style.background = "transparent";
-        dot3.style.background = "white";
+        dot3.style.background = "#a4a87898";
         items.renderLeft("3");
-      } else if (color2 == "white") {
+      } else if (color2 == color) {
         dot2.style.background = "transparent";
-        dot1.style.background = "white";
+        dot1.style.background = "#a4a87898";
         items.renderLeft("4");
-      } else if (color3 == "white") {
+      } else if (color3 == color) {
         dot3.style.background = "transparent";
-        dot2.style.background = "white";
+        dot2.style.background = "#a4a87898";
         items.renderLeft("5");
       }
-    } else if (color1 == "white") {
+    } else if (color1 == color) {
       return;
-    } else if (color2 == "white") {
-      dot1.style.background = "white";
+    } else if (color2 == color) {
+      dot1.style.background = "#a4a87898";
       dot2.style.background = "transparent";
       items.renderLeft("1");
-    } else if (color3 == "white") {
-      dot2.style.background = "white";
+    } else if (color3 == color) {
+      dot2.style.background = "#a4a87898";
       dot3.style.background = "transparent";
       items.renderLeft("2");
     }
@@ -723,28 +725,29 @@ const listeners = {
     const color1 = dot1.style.background;
     const color2 = dot2.style.background;
     const color3 = dot3.style.background;
+    const color = storage.dotColor;
     if (storage.slider == "extend") {
-      if (color3 == "white") {
+      if (color3 == color) {
         return console.log("pause");
-      } else if (color1 == "white") {
+      } else if (color1 == color) {
         dot1.style.background = "transparent";
-        dot2.style.background = "white";
+        dot2.style.background = "#a4a87898";
         items.renderRight("5");
-      } else if (color2 == "white") {
+      } else if (color2 == color) {
         dot2.style.background = "transparent";
-        dot3.style.background = "white";
+        dot3.style.background = "#a4a87898";
         items.renderRight("6");
       }
-    } else if (color1 == "white" && storage.slider == "") {
+    } else if (color1 == color && storage.slider == "") {
       dot1.style.background = "transparent";
-      dot2.style.background = "white";
+      dot2.style.background = "#a4a87898";
       items.renderRight("2");
-    } else if (color2 == "white") {
-      dot3.style.background = "white";
+    } else if (color2 == color) {
+      dot3.style.background = "#a4a87898";
       dot2.style.background = "transparent";
       items.renderRight("3");
-    } else if (color3 == "white") {
-      dot1.style.background = "white";
+    } else if (color3 == color) {
+      dot1.style.background = "#a4a87898";
       dot3.style.background = "transparent";
       storage.slider = "extend";
       items.renderRight("4");
@@ -754,7 +757,7 @@ const listeners = {
     const dot1 = document.querySelector(".dot1");
     const dot2 = document.querySelector(".dot2");
     const dot3 = document.querySelector(".dot3");
-    dot1.style.background = "white";
+    dot1.style.background = "#a4a87898";
     dot2.style.background = "transparent";
     dot3.style.background = "transparent";
     storage.slider = "";
@@ -1101,10 +1104,10 @@ const search = {
     const dot3 = document.querySelector(".dot3");
     const color2 = dot2.style.background;
     const color3 = dot3.style.background;
-    if (color2 == "white" || color3 == "white") {
+    if (color2 == "#a4a87898" || color3 == "#a4a87898") {
       dot2.style.background = "transparent";
       dot3.style.background = "transparent";
-      dot1.style.background = "white";
+      dot1.style.background = "#a4a87898";
     }
   },
 };
