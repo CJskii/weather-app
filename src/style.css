@@ -134,6 +134,15 @@ body {
   content: url(./img/search_icon.svg);
   width: 50px;
   height: 50px;
+  filter: invert(26%) sepia(25%) saturate(28%) hue-rotate(346deg)
+    brightness(90%) contrast(97%);
+  transition: linear 0.3s;
+}
+
+.search-icon:hover {
+  filter: invert(55%) sepia(25%) saturate(28%) hue-rotate(346deg)
+    brightness(90%) contrast(97%);
+  cursor: pointer;
 }
 
 .weather-icon {
@@ -200,6 +209,22 @@ input::placeholder {
   color: var(--color3);
   font-size: 1.6rem;
   font-family: Ubuntu, sans-serif;
+}
+
+.humidity-icon,
+.feelslike-icon,
+.wind-icon,
+.pressure-icon {
+  filter: invert(44%) sepia(25%) saturate(28%) hue-rotate(346deg)
+    brightness(90%) contrast(97%);
+}
+
+.humidity-icon:hover,
+.feelslike-icon:hover,
+.wind-icon:hover,
+.pressure-icon:hover {
+  filter: invert(55%) sepia(25%) saturate(28%) hue-rotate(346deg)
+    brightness(90%) contrast(97%);
 }
 
 .humidity-icon {
@@ -355,6 +380,11 @@ input::placeholder {
   background-color: white;
   border-radius: 25px;
   border: 2px solid transparent;
+  transition: linear 0.3s;
+}
+
+.dot:hover {
+  scale: 1.1;
 }
 
 .slide-right {
@@ -370,12 +400,16 @@ input::placeholder {
   width: 35px;
   height: 35px;
   transition: ease-in 0.3s;
+  filter: invert(44%) sepia(1%) saturate(44%) hue-rotate(55deg) brightness(90%)
+    contrast(97%);
 }
 
 .slide-left:hover,
 .slide-right:hover {
   scale: 1.2;
   cursor: pointer;
+  filter: invert(77%) sepia(1%) saturate(88%) hue-rotate(55deg) brightness(100%)
+    contrast(97%);
 }
 
 /* BTNS */
