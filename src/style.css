@@ -464,3 +464,35 @@ input::placeholder {
   background: var(--color5);
   color: #fff;
 }
+
+@media (max-width: 768px) {
+  .forecast-time {
+    font-size: 1.4rem;
+  }
+}
+
+@media (max-width: 425px) {
+  .weather-container {
+    flex-direction: column;
+    height: fit-content;
+  }
+  .info-container,
+  .details-container {
+    justify-content: center;
+    align-items: center;
+  }
+  .forecast {
+    flex-direction: column;
+  }
+  .forecast-container {
+    display: grid;
+    margin-top: 2rem;
+  }
+  .forecast-change {
+    display: grid;
+  }
+  .content {
+    background-color: rgba(0, 0, 0, 0.863);
+    height: fit-content;
+  }
+}
