@@ -496,3 +496,35 @@ input::placeholder {
     height: fit-content;
   }
 }
+
+@media (max-width: 375px) {
+  .description {
+    font-size: 1.8rem;
+  }
+}
+
+@media (max-width: 320px) {
+  .description {
+    font-size: 1.6rem;
+  }
+  .city {
+    font-size: 1.2rem;
+  }
+  .details-info > span:first-child {
+    font-size: 1.8rem;
+  }
+
+  .details-info > span:nth-child(2) {
+    color: var(--color3);
+    font-size: 1 rem;
+    font-family: Ubuntu, sans-serif;
+  }
+  .details-container {
+    width: 100%;
+  }
+  .weather-details {
+    display: flex;
+    justify-content: space-around;
+    color: red;
+  }
+}
