@@ -485,7 +485,7 @@ export const search = {
 };
 
 // transform data
-const transform = {
+export const transform = {
   time: (UNIX_timestamp) => {
     const a = new Date(UNIX_timestamp * 1000);
     const months = [
